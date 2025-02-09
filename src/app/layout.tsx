@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@/app/globals.css";
 import Providers from "./provider";
+import Layout from "@/components/layout/Layout";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +17,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <QueryClientProvider client={queryClient}>
-            {children}
+            <Layout>{children}</Layout>
           </QueryClientProvider>
         </Providers>
       </body>

@@ -2,6 +2,7 @@ import { IMaintenanceTask, IProduct } from "@/types";
 import { delay } from "@/lib/utils";
 import { api } from "@/api/axios";
 import { uploadImage } from "@/api/upload";
+import { getSession } from "next-auth/react";
 
 /**
  * Fetches a single product by its ID, including associated tasks.
@@ -41,6 +42,11 @@ export const fetchProducts = async (
   fields?: string[]
 ) => {
   try {
+    const session = await getSession();
+    if (!session?.user?.accessToken) {
+      throw new Error("User not authenticated");
+    }
+
     const query = new URLSearchParams();
     query.append("page", page.toString());
     query.append("limit", limit.toString());

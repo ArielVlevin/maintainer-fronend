@@ -3,17 +3,19 @@ import { getSession } from "next-auth/react";
 
 /**
  * The base API URL for all requests.
- * This URL is retrieved from the environment variable `NEXT_PUBLIC_API_URL`.
+ * This URL is retrieved from the environment variable `NEXT_PUBLIC_API_URL`
+ * and used as the base endpoint for API calls.
  */
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api";
 
 /**
  * Axios instance configured with the base API URL and default headers.
+ * This instance ensures all requests use JSON data format.
  *
  * @constant
  * @type {import("axios").AxiosInstance}
  * @property {string} baseURL - The base URL for API requests.
- * @property {Object} headers - The default headers for all API requests.
+ * @property {Object} headers - Default headers for all API requests.
  * @property {string} headers.Content-Type - Specifies that all requests send JSON data.
  *
  * @example
@@ -27,36 +29,25 @@ export const api = axios.create({
 });
 
 /**
- * Axios request interceptor that attaches the user's token from NextAuth.
- * If no token is found, the request proceeds without authorization.
+ * Axios request interceptor that attaches the user's JWT token from NextAuth.
+ * This ensures that all API requests are authenticated with a valid token.
+ *
+ * - Retrieves the user's session using `getSession()`.
+ * - If a valid `accessToken` exists, it is attached to the request headers.
+ * - If no token is found, the request proceeds without authentication.
+ *
+ * @returns {Promise<import("axios").AxiosRequestConfig>} - The updated request config.
  */
 api.interceptors.request.use(
   async (config) => {
     const session = await getSession();
 
-    if (session?.user?.accessToken) {
+    if (session?.user?.accessToken)
       config.headers.Authorization = `Bearer ${session.user.accessToken}`;
-    }
 
     return config;
   },
   (error) => {
-    return Promise.reject(error);
-  }
-);
-
-/**
- * Axios response interceptor that logs errors and handles authentication failures.
- * If a request fails due to authentication, it will attempt to refresh the session.
- */
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      console.warn("🔄 Token expired, refreshing session...");
-      await getSession(); // Refresh session
-    }
-
     return Promise.reject(error);
   }
 );

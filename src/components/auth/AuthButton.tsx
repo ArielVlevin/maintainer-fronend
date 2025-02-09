@@ -1,18 +1,48 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { FcGoogle } from "react-icons/fc";
+import { Apple, Facebook } from "lucide-react";
+import { useState } from "react";
 
-export function AuthButton() {
-  const { data: session } = useSession();
+export default function AuthButtons() {
+  const [isLoading, setIsLoading] = useState(false);
 
-  return session ? (
-    <div className="flex items-center gap-4">
-      <p>Welcome, {session.user?.name}!</p>
-      <Button onClick={() => signOut()}>Sign Out</Button>
+  const handleSignIn = async (provider: string) => {
+    setIsLoading(true);
+    await signIn(provider, { callbackUrl: "/dashboard" });
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <Button
+        className="w-full flex items-center justify-center gap-2"
+        variant="outline"
+        onClick={() => handleSignIn("google")}
+        disabled={isLoading}
+      >
+        <FcGoogle className="w-5 h-5" />
+        Sign in with Google
+      </Button>
+      <Button
+        className="w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-gray-800"
+        onClick={() => handleSignIn("apple")}
+        disabled={isLoading}
+      >
+        <Apple className="w-5 h-5" />
+        Sign in with Apple
+      </Button>
+      <Button
+        className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700"
+        onClick={() => handleSignIn("facebook")}
+        disabled={isLoading}
+      >
+        <Facebook className="w-5 h-5" />
+        Sign in with Facebook
+      </Button>
     </div>
-  ) : (
-    <Button onClick={() => signIn("google")}>Sign In with Google</Button>
   );
 }
 

@@ -16,6 +16,7 @@ export interface IMaintenanceTask {
  */
 export interface IProduct {
   _id?: string; // Optional unique identifier for the product (MongoDB ID)
+  user_id: string;
   name: string; // Name of the product
   category?: string; // Optional category of the product
   tags?: string[] | string; // Tags associated with the product (string or array)
