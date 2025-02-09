@@ -4,12 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  CheckCircle,
-  PenToolIcon as Tool,
-  Clock,
-  BarChart,
-} from "lucide-react";
+import { CheckCircle, Clock, BarChart } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LandingPage() {

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,12 +10,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Apple, Facebook, PenToolIcon as Tool } from "lucide-react";
+import { Apple, Facebook } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
+  const { data: session, status } = useSession();
+
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
 
   const handleSignIn = async (provider: string) => {
     setIsLoading(true);

@@ -54,7 +54,7 @@ export default function LandingHeader() {
             </Button>
           </Link>
         ) : (
-          <Link href="/sign-in">
+          <Link href="/dashboard/sign-in">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
               Sign In
             </Button>

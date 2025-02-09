@@ -26,8 +26,8 @@ import { fetchProducts } from "@/api/product";
 import { fetchProductTasks } from "@/api/tasks";
 
 export default function UserAreaPage() {
-  const { data: session } = useSession();
-  const userName = session?.user?.name || "User";
+  const { data: session, status } = useSession();
+  const userName = session?.user?.name;
 
   const [products, setProducts] = useState<IProduct[]>([]);
   const [tasks, setTasks] = useState<IMaintenanceTask[]>([]);
@@ -35,25 +35,30 @@ export default function UserAreaPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const { products } = await fetchProducts(1, 10);
-        const tasks = await fetchProductTasks(products[0]._id); // Assuming fetchTasks gets user's tasks
-        setProducts(products);
-        setTasks(tasks);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // אם המשתמש נטען ורק אז מבצע את הקריאה ל-API
+    if (status === "authenticated") {
+      const loadUserData = async () => {
+        try {
+          const { products } = await fetchProducts(1, 10);
+          if (products.length === 0) {
+            setProducts([]);
+            setTasks([]);
+            return;
+          }
 
-    loadUserData();
-  }, []);
+          const tasks = await fetchProductTasks(products[0]._id);
+          setProducts(products);
+          setTasks(tasks);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  if (loading) return <p className="text-center">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
-
+      loadUserData();
+    }
+  }, [status]);
   return (
     <AuthGuard>
       <div className="flex-1">

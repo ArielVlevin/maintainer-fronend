@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
    * Defines a custom sign-in page route.
    */
   pages: {
-    signIn: "/sign-in",
+    signIn: "/dashboard/sign-in",
   },
 
   /**
@@ -65,7 +65,7 @@ export const authOptions: NextAuthOptions = {
     /**
      * Handles JWT token generation.
      * - If the user logs in, generates a **custom JWT** containing user details.
-     * - Stores `id`, `email`, and `role` inside the token.
+     * - Stores id, email, and role inside the token.
      * - Token expires in 7 days.
      *
      * @param {JWT} token - The existing JWT token.
@@ -82,9 +82,18 @@ export const authOptions: NextAuthOptions = {
       user?: any;
       account?: any;
     }) {
+      console.log("@@@@user:", user);
+      console.log("@@@@token:", token);
+      console.log("@@@@account:", account);
+
       if (user) {
+        token._id = user.id || user._id || token.sub;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image;
+        token.emailVerified = user.emailVerified;
         token.accessToken = jwt.sign(
-          { id: user.id, email: user.email }, // Store user role and email
+          { _id: user.id, email: user.email }, // Store user role and email
           JWT_SECRET,
           { expiresIn: "7d" }
         );
@@ -98,12 +107,15 @@ export const authOptions: NextAuthOptions = {
      *
      * @param {Session} session - The user session object.
      * @param {JWT} token - The JWT token containing user data.
-     * @returns {Session} - Updated session object with `accessToken`.
+     * @returns {Session} - Updated session object with accessToken.
      */
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        session.user._id = token.sub!;
-        session.user.accessToken = token.accessToken; // Attach JWT to session
+        session.user._id = String(token._id);
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.image;
+        session.user.accessToken = token.accessToken;
       }
       return session;
     },
@@ -118,7 +130,7 @@ export const authOptions: NextAuthOptions = {
 
 /**
  * The NextAuth handler for authentication routes.
- * Exposes authentication API endpoints (`/api/auth`).
+ * Exposes authentication API endpoints (/api/auth).
  */
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

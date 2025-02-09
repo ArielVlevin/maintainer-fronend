@@ -1,9 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FullScreenLoader from "../common/FullScreenLoading";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * @component AuthGuard
@@ -13,16 +14,28 @@ import FullScreenLoader from "../common/FullScreenLoading";
  * @returns {JSX.Element} - Either the protected content or redirects to `/sign-in`.
  */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  useAuth();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/sign-in"); // Redirect to sign-in if user is not logged in
+      router.push("/dashboard/sign-in"); // Redirect to sign-in if user is not logged in
     }
   }, [status, router]);
 
-  // Show nothing while checking session state
+  // ✅ Listen for session updates (e.g., when user logs out)
+  useEffect(() => {
+    const handleLogout = async () => {
+      if (!session) {
+        await update(); // Force session update
+        router.push("/dashboard/sign-in");
+      }
+    };
+    handleLogout();
+  }, [session, router, update]);
+
+  // Show loader while checking session state
   if (status === "loading") {
     return <FullScreenLoader />;
   }
