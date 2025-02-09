@@ -1,0 +1,1 @@
+ Next.js + TypeScript + tailwind + ShadCN + React Query + next-auth
