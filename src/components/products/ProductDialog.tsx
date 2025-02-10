@@ -14,6 +14,8 @@
 import { useProductForm } from "@/hooks/useProductForm";
 import ProductFields from "./ProductField";
 import FormDialog from "../common/FormDialog";
+import { useState } from "react";
+import { Button } from "../ui/button";
 
 interface ProductDialogProps {
   productId?: string;
@@ -54,5 +56,29 @@ export default function ProductDialog({
         imageUploadProps={imageUploadProps}
       />
     </FormDialog>
+  );
+}
+
+/**
+ * @component AddProductButton
+ * @description A full-width button that opens the `ProductDialog` to add a new product.
+ *
+ * @returns {JSX.Element} The Add Product Button UI.
+ */
+export function AddProductButton() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  return (
+    <>
+      <Button className="w-full" onClick={() => setIsDialogOpen(true)}>
+        Add New Product
+      </Button>
+
+      {/* ✅ דיאלוג להוספת מוצר */}
+      <ProductDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
+    </>
   );
 }

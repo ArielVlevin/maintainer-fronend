@@ -1,45 +1,35 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FullScreenLoader from "../common/FullScreenLoading";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/authContext";
 
 /**
  * @component AuthGuard
- * @description Prevents unauthenticated users from accessing protected pages.
+ * @description Protects pages by restricting access to authenticated users.
+ * Redirects:
+ *  - Unauthenticated users → `/dashboard/sign-in`
+ *  - Users with incomplete profiles → `/dashboard/complete-profile`
  *
- * @param {React.ReactNode} children - The page content that needs protection.
- * @returns {JSX.Element} - Either the protected content or redirects to `/sign-in`.
+ * @param {React.ReactNode} children - The protected content.
+ * @returns {JSX.Element} - Either the protected content or redirects.
  */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  useAuth();
-  const { data: session, status, update } = useSession();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/dashboard/sign-in"); // Redirect to sign-in if user is not logged in
-    }
-  }, [status, router]);
-
-  // ✅ Listen for session updates (e.g., when user logs out)
-  useEffect(() => {
-    const handleLogout = async () => {
-      if (!session) {
-        await update(); // Force session update
-        router.push("/dashboard/sign-in");
+    if (!isLoading) {
+      if (!user) {
+        router.replace("/sign-in"); // 🔴 הפניה רק אחרי שהטעינה הסתיימה
+      } else if (!user.profileCompleted) {
+        router.replace("/dashboard/complete-profile"); // 🔄 הפניה אם הפרופיל לא שלם
       }
-    };
-    handleLogout();
-  }, [session, router, update]);
+    }
+    return;
+  }, [user, isLoading, router]);
+  if (isLoading) return <FullScreenLoader />;
 
-  // Show loader while checking session state
-  if (status === "loading") {
-    return <FullScreenLoader />;
-  }
-
-  // ✅ If authenticated, render the protected page
   return <>{children}</>;
 }

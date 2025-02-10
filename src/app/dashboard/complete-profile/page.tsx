@@ -1,48 +1,104 @@
 "use client";
 
-import AuthGuard from "@/components/auth/AuthGuard";
-import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { verifyUser } from "@/api/auth";
+import { useAuth } from "@/context/authContext";
+import AuthGuard from "@/components/auth/AuthGuard";
+import { delay } from "@/lib/utils";
 
-export default function CompleteProfile() {
-  const { data: session } = useSession();
+export default function NewUserPage() {
   const router = useRouter();
-  const [name, setName] = useState(session?.user?.name || "");
-  const [email, setEmail] = useState(session?.user?.email || "");
+  const { user, refreshUser } = useAuth();
 
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: user?.email || "",
+    name: user?.name || "",
+  });
+
+  /**
+   * ✅ עדכון ה-state כאשר `user` משתנה
+   */
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        email: user.email || "",
+        name: user.name || "",
+      });
+    }
+  }, [user]);
+
+  /**
+   * ✅ מעדכן את ה-state בכל שינוי בשדות
+   */
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  /**
+   * ✅ שולח את הנתונים המעודכנים ל-backend רק בלחיצת שמירה
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      if (!user?._id) throw new Error("User ID is missing");
 
-    // כאן אתה יכול לשלוח את המידע ל-Backend כדי לעדכן את הפרופיל של המשתמש
-
-    router.push("/dashboard"); // לאחר השלמת הפרופיל, שלח ל-Dashboard
+      await verifyUser({
+        _id: user._id,
+        name: formData.name,
+        email: formData.email,
+      });
+      await refreshUser();
+      delay(1000);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("❌ Failed to update user:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <AuthGuard>
-      <div className="p-6">
+      <div>
         <h1 className="text-2xl font-bold">Complete Your Profile</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            className="border p-2 w-full"
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            className="border p-2 w-full"
-            type="email"
-            placeholder="Email"
-            value={email}
-            disabled
-          />
+        <p>Welcome {user?.name || "Guest"}, please complete your profile.</p>
+
+        {/* ✅ טופס עדכון פרופיל */}
+        <form className="mt-6" onSubmit={handleSubmit}>
+          <label className="block">
+            Full Name:
+            <input
+              type="text"
+              name="name"
+              className="border p-2 w-full"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </label>
+
+          <label className="block mt-4">
+            Email:
+            <input
+              type="email"
+              name="email"
+              className="border p-2 w-full"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </label>
+
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
             type="submit"
+            className="bg-blue-500 text-white p-2 rounded mt-4"
+            disabled={loading}
           >
-            Save Profile
+            {loading ? "Saving..." : "Save"}
           </button>
         </form>
       </div>

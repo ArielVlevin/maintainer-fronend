@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { JWT } from "next-auth/jwt";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
+import { IUser } from "@/types/IUser";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -29,7 +30,8 @@ export const authOptions: NextAuthOptions = {
    * Defines a custom sign-in page route.
    */
   pages: {
-    signIn: "/dashboard/sign-in",
+    signIn: "/sign-in",
+    newUser: "/dashboard/complete-profile",
   },
 
   /**
@@ -82,18 +84,17 @@ export const authOptions: NextAuthOptions = {
       user?: any;
       account?: any;
     }) {
-      console.log("@@@@user:", user);
-      console.log("@@@@token:", token);
-      console.log("@@@@account:", account);
-
       if (user) {
+        //first log-in
+
         token._id = user.id || user._id || token.sub;
         token.name = user.name;
         token.email = user.email;
-        token.image = user.image;
-        token.emailVerified = user.emailVerified;
+        // token.image = user.image;
+        //token.emailVerified = user.emailVerified;
+
         token.accessToken = jwt.sign(
-          { _id: user.id, email: user.email }, // Store user role and email
+          { _id: user.id, email: user.email },
           JWT_SECRET,
           { expiresIn: "7d" }
         );
@@ -114,8 +115,8 @@ export const authOptions: NextAuthOptions = {
         session.user._id = String(token._id);
         session.user.name = token.name;
         session.user.email = token.email;
-        session.user.image = token.image;
         session.user.accessToken = token.accessToken;
+        //  session.user.profileCompleted = token.profileCompleted as boolean; // ✅ שולח ל-Frontend
       }
       return session;
     },

@@ -2,7 +2,6 @@ import { IMaintenanceTask, IProduct } from "@/types";
 import { delay } from "@/lib/utils";
 import { api } from "@/api/axios";
 import { uploadImage } from "@/api/upload";
-import { getSession } from "next-auth/react";
 
 /**
  * Fetches a single product by its ID, including associated tasks.
@@ -24,48 +23,89 @@ export const fetchProductById = async (
 };
 
 /**
- * Fetches a paginated list of products with optional search and filtering.
- *
- * @param {number} page - The page number to fetch.
- * @param {number} limit - The number of products per page.
- * @param {string} [search] - Optional search query for filtering products.
- * @param {string} [category] - Optional category filter.
- * @param {string[]} [fields] - Optional list of fields to include in the response.
- * @returns {Promise<{ products: IProduct[], total: number, totalPages: number }>} The paginated product data.
- * @throws {Error} If the request fails.
+ * Parameters for fetching products from the API.
  */
-export const fetchProducts = async (
-  page: number,
-  limit: number,
-  search?: string,
-  category?: string,
-  fields?: string[]
-) => {
-  try {
-    const session = await getSession();
-    if (!session?.user?.accessToken) {
-      throw new Error("User not authenticated");
-    }
+type FetchProductsParams = {
+  /**
+   * The page number for pagination.
+   */
+  page: number;
 
+  /**
+   * The number of products to fetch per page.
+   */
+  limit: number;
+
+  /**
+   * (Optional) A search query to filter products by name or description.
+   */
+  search?: string;
+
+  /**
+   * (Optional) A category filter to fetch only products within a specific category.
+   * If set to "all", it will not apply any category filtering.
+   */
+  category?: string;
+
+  /**
+   * (Optional) An array of field names to specify which product attributes should be returned.
+   */
+  fields?: string[];
+
+  /**
+   * (Optional) If `true`, fetch only products that belong to the currently authenticated user.
+   */
+  userOnly?: boolean;
+};
+
+/**
+ * Fetches products from the API based on the given parameters.
+ * Supports pagination, search, filtering, and user-specific products.
+ *
+ * @param {FetchProductsParams} params - The parameters for fetching products.
+ * @returns {Promise<{ products: IProduct[], total: number }>} A promise that resolves to the list of products and total count.
+ * @throws {Error} Throws an error if the request fails.
+ */
+export const fetchProducts = async ({
+  page,
+  limit = 9,
+  search,
+  category,
+  fields,
+  userOnly,
+}: FetchProductsParams) => {
+  try {
     const query = new URLSearchParams();
     query.append("page", page.toString());
     query.append("limit", limit.toString());
 
     if (search) query.append("search", search);
     if (category && category !== "all") query.append("category", category);
-    if (fields && fields.length > 0) {
-      query.append("fields", fields.join(","));
-    }
+    if (fields && fields.length > 0) query.append("fields", fields.join(","));
+    if (userOnly) query.append("userOnly", "true");
 
     await delay(1000); // Simulated delay
 
     const { data } = await api.get(`/products?${query.toString()}`);
+    console.log("data: ", data);
     return data;
   } catch (error) {
     console.error("❌ Error fetching products:", error);
     throw new Error("Failed to fetch products. Please try again.");
   }
 };
+
+/**
+ * Fetches only the products associated with the currently authenticated user.
+ * This function is a wrapper around `fetchProducts`, ensuring that only the user's products are retrieved.
+ *
+ * @returns {Promise<{ products: IProduct[], total: number }>} A promise that resolves to the list of user-specific products and total count.
+ * @throws {Error} Throws an error if the request fails.
+ */
+export const fetchUserProducts = async (): Promise<{
+  products: IProduct[];
+  total: number;
+}> => fetchProducts({ page: 1, limit: 10, userOnly: true });
 
 /**
  * Fetches all tasks associated with a specific product.
