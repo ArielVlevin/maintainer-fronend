@@ -4,14 +4,14 @@ import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IMaintenanceTask } from "@/types";
+import { ITask } from "@/types/ITask";
 import AlertComponent from "../common/AlertDialog";
 import { useState } from "react";
 import TaskDialog from "./TaskDialog";
 import { CardDropdownMenu } from "../app-ui/card/CardDropDownMenu";
 
 interface TaskCardProps {
-  task: IMaintenanceTask;
+  task: ITask;
   onTakeCare: (id: string) => void;
   onDelete: (id: string) => void;
 }

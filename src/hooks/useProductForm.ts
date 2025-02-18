@@ -48,7 +48,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addProduct, fetchProductById, updateProduct } from "@/api/product";
 import { useRouter } from "next/navigation";
-import { IProduct } from "@/types";
+import { IProduct } from "@/types/IProduct";
 import { useImageUpload } from "@/hooks/use-image-upload";
 
 interface UseProductFormProps {
@@ -64,6 +64,7 @@ export function useProductForm({ productId }: UseProductFormProps) {
     name: "",
     category: "",
     manufacturer: "",
+    user_id: "",
     model: "",
     tags: [],
     purchaseDate: new Date(),
@@ -123,6 +124,7 @@ export function useProductForm({ productId }: UseProductFormProps) {
         name: "",
         category: "",
         manufacturer: "",
+        user_id: "",
         model: "",
         tags: [],
         purchaseDate: new Date(),

@@ -46,7 +46,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addTaskToProduct, fetchTaskById, updateTask } from "@/api/tasks";
 import { useRouter } from "next/navigation";
-import { IMaintenanceTask } from "@/types";
+import { ITask } from "@/types/ITask";
 
 interface UseTaskFormProps {
   product_id: string;
@@ -58,8 +58,9 @@ export function useTaskForm({ product_id, taskId }: UseTaskFormProps) {
   const router = useRouter();
 
   // ✅ Initial Form State
-  const [formData, setFormData] = useState<IMaintenanceTask>({
+  const [formData, setFormData] = useState<ITask>({
     product_id,
+    user_id: "",
     taskName: "",
     description: "",
     lastMaintenance: new Date(),
@@ -105,6 +106,7 @@ export function useTaskForm({ product_id, taskId }: UseTaskFormProps) {
 
       setFormData({
         product_id,
+        user_id: "",
         taskName: "",
         description: "",
         lastMaintenance: new Date(),
@@ -112,7 +114,7 @@ export function useTaskForm({ product_id, taskId }: UseTaskFormProps) {
         nextMaintenance: new Date(),
       });
 
-      router.push(`/products/${product_id}/tasks`);
+      router.push(`/product/${product_id}`);
     },
     onError: (error) => {
       console.error("❌ Error processing task:", error);

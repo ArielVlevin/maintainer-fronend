@@ -1,9 +1,10 @@
-import { IProduct } from "@/types";
 import Image from "next/image";
 import { DEFAULT_IMAGES } from "@/config/defaultImages";
 import { fetchProductById } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton_ProductDetails } from "./Skeleton_ProductDetails";
+import { IProduct } from "@/types/IProduct";
+import { ITask } from "@/types/ITask";
 
 interface ProductDetailsProps {
   /**
@@ -83,25 +84,26 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
             : ""
           : "No Tags"}
       </p>
-      <p>
-        <strong>Purchase Date:</strong>{" "}
-        {new Date(product.purchaseDate).toLocaleDateString()}
-      </p>
-
+      {product.purchaseDate && (
+        <p>
+          <strong>Purchase Date:</strong>
+          {new Date(product.purchaseDate!).toLocaleDateString()}
+        </p>
+      )}
       {/* Maintenance Information */}
       <p>
         <strong>Last Maintenance:</strong>{" "}
         {product.lastOverallMaintenance
-          ? `${product.lastOverallMaintenance.taskName} - ${new Date(
-              product.lastOverallMaintenance.lastMaintenance
+          ? `${(product.lastOverallMaintenance as ITask).taskName} - ${new Date(
+              (product.lastOverallMaintenance as ITask).lastMaintenance
             ).toLocaleDateString()}`
           : "No Maintenance Data"}
       </p>
       <p>
         <strong>Next Maintenance:</strong>{" "}
         {product.nextOverallMaintenance
-          ? `${product.nextOverallMaintenance.taskName} - ${new Date(
-              product.nextOverallMaintenance.nextMaintenance
+          ? `${(product.nextOverallMaintenance as ITask).taskName} - ${new Date(
+              (product.nextOverallMaintenance as ITask).nextMaintenance
             ).toLocaleDateString()}`
           : "No Upcoming Maintenance"}
       </p>

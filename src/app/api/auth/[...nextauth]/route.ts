@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import { JWT } from "next-auth/jwt";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
-import { IUser } from "@/types/IUser";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 

@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 /**
  * @interface FormFieldProps
@@ -20,6 +21,7 @@ interface FormFieldProps {
   value: string | number | Date | string[]; // Fixed `any` type to be either a string or a number
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
+  className?: string;
 }
 
 /**
@@ -56,10 +58,13 @@ export default function FormField({
   value,
   onChange,
   required = true,
+  className,
 }: FormFieldProps) {
   return (
-    <div className="flex flex-col gap-1">
-      <Label htmlFor={name}>{label}</Label>
+    <div className={cn(className, "flex flex-col gap-1 mb-4")}>
+      <Label htmlFor={name} className="block font-medium mb-1">
+        {label}
+      </Label>
       <Input
         id={name}
         type={type}

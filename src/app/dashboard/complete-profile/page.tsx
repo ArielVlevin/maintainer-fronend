@@ -17,9 +17,6 @@ export default function NewUserPage() {
     name: user?.name || "",
   });
 
-  /**
-   * ✅ עדכון ה-state כאשר `user` משתנה
-   */
   useEffect(() => {
     if (user) {
       setFormData({
@@ -29,9 +26,6 @@ export default function NewUserPage() {
     }
   }, [user]);
 
-  /**
-   * ✅ מעדכן את ה-state בכל שינוי בשדות
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -54,7 +48,7 @@ export default function NewUserPage() {
         email: formData.email,
       });
       await refreshUser();
-      delay(1000);
+      await delay(2000);
       router.push("/dashboard");
     } catch (error) {
       console.error("❌ Failed to update user:", error);

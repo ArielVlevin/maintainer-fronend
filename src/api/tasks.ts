@@ -1,16 +1,33 @@
-import { IMaintenanceTask } from "@/types";
 import { api } from "@/api/axios";
+import { ITask } from "@/types/ITask";
+
+/**
+ * Fetches all maintenance tasks for the logged-in user.
+ *
+ * @param {string} userId - The ID of the user.
+ * @returns {Promise<ITask[]>} A promise resolving to an array of user-specific tasks.
+ * @throws {Error} If the request fails.
+ */
+export const fetchUserTasks = async (userId: string): Promise<ITask[]> => {
+  try {
+    const { data } = await api.get(`/tasks?user_id=${userId}`);
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching user tasks:", error);
+    throw new Error("Failed to fetch tasks.");
+  }
+};
 
 /**
  * Fetches all maintenance tasks for a specific product.
  *
  * @param {string} productId - The ID of the product whose tasks should be retrieved.
- * @returns {Promise<IMaintenanceTask[]>} A promise that resolves to an array of tasks.
+ * @returns {Promise<ITask[]>} A promise that resolves to an array of tasks.
  * @throws {Error} If the request fails.
  */
 export const fetchProductTasks = async (
   productId: string
-): Promise<IMaintenanceTask[]> => {
+): Promise<ITask[]> => {
   try {
     const { data } = await api.get(`/products/${productId}/tasks`);
     return data;
@@ -24,12 +41,10 @@ export const fetchProductTasks = async (
  * Fetches a maintenance task by its ID.
  *
  * @param {string} taskId - The ID of the task to fetch.
- * @returns {Promise<IMaintenanceTask>} A promise that resolves to the requested task.
+ * @returns {Promise<ITask>} A promise that resolves to the requested task.
  * @throws {Error} If the request fails.
  */
-export const fetchTaskById = async (
-  taskId: string
-): Promise<IMaintenanceTask> => {
+export const fetchTaskById = async (taskId: string): Promise<ITask> => {
   try {
     const { data } = await api.get(`/tasks/${taskId}`);
     return data;
@@ -43,14 +58,11 @@ export const fetchTaskById = async (
  * Adds a new maintenance task to a specific product.
  *
  * @param {string} product_id - The ID of the product to which the task belongs.
- * @param {IMaintenanceTask} task - The task details.
- * @returns {Promise<IMaintenanceTask>} A promise that resolves to the newly created task.
+ * @param {ITask} task - The task details.
+ * @returns {Promise<ITask>} A promise that resolves to the newly created task.
  * @throws {Error} If the request fails.
  */
-export const addTaskToProduct = async (
-  product_id: string,
-  task: IMaintenanceTask
-) => {
+export const addTaskToProduct = async (product_id: string, task: ITask) => {
   try {
     const { data } = await api.post(`/tasks/${product_id}`, {
       ...task,
@@ -67,14 +79,14 @@ export const addTaskToProduct = async (
  * Updates an existing maintenance task by its ID.
  *
  * @param {string} taskId - The ID of the task to update.
- * @param {IMaintenanceTask} updatedTaskData - The updated task details.
- * @returns {Promise<IMaintenanceTask>} A promise that resolves to the updated task.
+ * @param {ITask} updatedTaskData - The updated task details.
+ * @returns {Promise<ITask>} A promise that resolves to the updated task.
  * @throws {Error} If the request fails.
  */
 export const updateTask = async (
   taskId: string,
-  updatedTaskData: IMaintenanceTask
-): Promise<IMaintenanceTask> => {
+  updatedTaskData: ITask
+): Promise<ITask> => {
   try {
     const { data } = await api.put(`/tasks/${taskId}`, updatedTaskData);
     return data;

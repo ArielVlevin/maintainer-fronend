@@ -1,7 +1,7 @@
 import { createContext, useContext, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
-import { IUser } from "@/types";
+import { IUser } from "@/types/IUser";
 import { fetchUserById } from "@/api/auth";
 
 interface AuthContextType {

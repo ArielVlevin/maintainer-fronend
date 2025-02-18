@@ -1,7 +1,8 @@
-import { IMaintenanceTask, IProduct } from "@/types";
 import { delay } from "@/lib/utils";
 import { api } from "@/api/axios";
 import { uploadImage } from "@/api/upload";
+import { IProduct } from "@/types/IProduct";
+import { ITask } from "@/types/ITask";
 
 /**
  * Fetches a single product by its ID, including associated tasks.
@@ -87,7 +88,6 @@ export const fetchProducts = async ({
     await delay(1000); // Simulated delay
 
     const { data } = await api.get(`/products?${query.toString()}`);
-    console.log("data: ", data);
     return data;
   } catch (error) {
     console.error("❌ Error fetching products:", error);
@@ -111,12 +111,12 @@ export const fetchUserProducts = async (): Promise<{
  * Fetches all tasks associated with a specific product.
  *
  * @param {string} productId - The ID of the product whose tasks should be fetched.
- * @returns {Promise<IMaintenanceTask[]>} An array of tasks.
+ * @returns {Promise<ITask[]>} An array of tasks.
  * @throws {Error} If the request fails.
  */
 export const fetchProductTasks = async (
   productId: string
-): Promise<IMaintenanceTask[]> => {
+): Promise<ITask[]> => {
   try {
     const { data } = await api.get(`/products/${productId}/tasks`);
     return data;

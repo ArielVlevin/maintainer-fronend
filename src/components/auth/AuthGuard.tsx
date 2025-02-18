@@ -22,9 +22,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.replace("/sign-in"); // 🔴 הפניה רק אחרי שהטעינה הסתיימה
+        router.replace("/sign-in");
       } else if (!user.profileCompleted) {
-        router.replace("/dashboard/complete-profile"); // 🔄 הפניה אם הפרופיל לא שלם
+        router.replace("/dashboard/complete-profile");
       }
     }
     return;

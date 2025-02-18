@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 
 /**
  * The base API URL for all requests.
@@ -48,6 +48,30 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Axios response interceptor that handles authentication errors automatically.
+ * This ensures that users are logged out when their JWT token expires or becomes invalid.
+ *
+ * - Listens for `401 Unauthorized` and `403 Forbidden` responses from the API.
+ * - If a `401` (token expired) or `403` (invalid token) is detected, the user is logged out.
+ * - Uses `signOut()` from `next-auth/react` to clear the session and redirect the user to `/sign-in`.
+ *
+ * @returns {Promise<import("axios").AxiosResponse | never>} - The original response or a rejected promise.
+ *
+ * @example
+ * api.get("/protected-route") // If token is expired, user is logged out and redirected to sign-in.
+ */
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn("🚨 Authentication error: Logging out...");
+      await signOut({ callbackUrl: "/sign-in" }); // ⬅️ מבצע התנתקות ושולח לדף ההתחברות
+    }
     return Promise.reject(error);
   }
 );

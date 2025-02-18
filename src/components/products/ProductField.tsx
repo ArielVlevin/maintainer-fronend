@@ -26,7 +26,7 @@
 
 import Avatar from "../img/Avatar";
 import FormField from "../app-ui/FormField";
-import { IProduct } from "@/types";
+import { IProduct } from "@/types/IProduct";
 
 interface ProductFieldsProps {
   formData: IProduct;
@@ -107,7 +107,7 @@ const ProductFields: React.FC<ProductFieldsProps> = ({
         label="Purchase Date"
         type="date"
         name="purchaseDate"
-        value={formData.purchaseDate}
+        value={formData.purchaseDate as Date}
         onChange={handleChange}
       />
     </>

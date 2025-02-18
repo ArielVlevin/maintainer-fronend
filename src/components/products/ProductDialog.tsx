@@ -16,6 +16,8 @@ import ProductFields from "./ProductField";
 import FormDialog from "../common/FormDialog";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
 
 interface ProductDialogProps {
   productId?: string;
@@ -65,16 +67,21 @@ export default function ProductDialog({
  *
  * @returns {JSX.Element} The Add Product Button UI.
  */
-export function AddProductButton() {
+
+interface AddProductButtonProps {
+  className?: string;
+}
+export function AddProductButton({
+  className = "flex items-center",
+}: AddProductButtonProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <>
-      <Button className="w-full" onClick={() => setIsDialogOpen(true)}>
-        Add New Product
+      <Button className={cn(className)} onClick={() => setIsDialogOpen(true)}>
+        <Plus className="h-4 w-4 mr-2" />
+        New Product
       </Button>
-
-      {/* ✅ דיאלוג להוספת מוצר */}
       <ProductDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
