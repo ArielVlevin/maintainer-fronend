@@ -13,7 +13,7 @@ import { useState } from "react";
 import ProductDialog from "./ProductDialog";
 import { CardDropdownMenu } from "../app-ui/card/CardDropDownMenu";
 import DetailsDialog from "../common/DetailDialog";
-import { ProductDetails } from "./ProductDetails";
+import { ProductDetails } from "./____ProductDetails";
 
 interface ProductCardProps {
   product: IProduct;

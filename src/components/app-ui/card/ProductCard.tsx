@@ -9,7 +9,7 @@ import { CardDropdownMenu } from "@/components/app-ui/card/CardDropDownMenu";
 import { Eye, List } from "lucide-react";
 import { IProduct } from "@/types";
 import DetailsDialog from "@/components/common/DetailDialog";
-import { ProductDetails } from "@/components/products/ProductDetails";
+import { ProductDetails } from "@/components/products/____ProductDetails";
 import ProductDialog from "@/components/products/ProductDialog";
 import AlertComponent from "@/components/common/AlertDialog";
 import MaintenanceStatus from "./MaintenanceStatus";

@@ -14,9 +14,9 @@ export interface IProduct {
   model?: string; // Optional model name
 
   purchaseDate?: Date; // The date the product was purchased
-  Tasks: string[] | ITask[]; // Array of maintenance tasks associated with the product
-  lastOverallMaintenance: ITask; // Last completed maintenance task
-  nextOverallMaintenance: ITask; // Upcoming maintenance task
+  tasks: string[] | ITask[]; // Array of maintenance tasks associated with the product
+  lastOverallMaintenance?: ITask; // Last completed maintenance task
+  nextOverallMaintenance?: ITask; // Upcoming maintenance task
 
   iconUrl?: string; // URL to the product icon
   bgColor?: string; // Optional background color for UI display

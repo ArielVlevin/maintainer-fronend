@@ -2,7 +2,7 @@ import Image from "next/image";
 import { DEFAULT_IMAGES } from "@/config/defaultImages";
 import { fetchProductById } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton_ProductDetails } from "./Skeleton_ProductDetails";
+import { Skeleton_ProductDetails } from "./___Skeleton_ProductDetails";
 import { IProduct } from "@/types/IProduct";
 import { ITask } from "@/types/ITask";
 

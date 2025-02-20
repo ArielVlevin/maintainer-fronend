@@ -1,8 +1,8 @@
 /**
- * `TaskDialog` Component
+ * TaskDialog Component
  *
  * This component renders a dialog for adding or editing a maintenance task.
- * It integrates with the `useTaskForm` hook to manage form state and handle task mutations.
+ * It integrates with the useTaskForm hook to manage form state and handle task mutations.
  *
  * @component
  *
@@ -14,14 +14,14 @@
  * @returns {JSX.Element} The rendered task dialog.
  *
  * @dependencies
- * - `useTaskForm` foֿֿr managing task form state and submitting changes.
- * - `FormDialog` for the modal UI.
- * - `TaskFields` for task input fields.
+ * - useTaskForm foֿֿr managing task form state and submitting changes.
+ * - FormDialog for the modal UI.
+ * - TaskFields for task input fields.
  *
  * @example
- * ```tsx
+ * tsx
  * <TaskDialog product_id="123" open={true} onClose={() => setOpen(false)} />
- * ```
+ *
  */
 
 "use client";
@@ -30,7 +30,6 @@ import { useTaskForm } from "@/hooks/useTaskForm";
 import FormDialog from "../common/FormDialog";
 import TaskFields from "./TaskField";
 import { useEffect, useState } from "react";
-import { fetchUserProducts } from "@/api/product";
 import { useAuth } from "@/context/authContext";
 import { IProduct } from "@/types/IProduct";
 
@@ -38,6 +37,8 @@ import FormSelect from "../app-ui/FormSelect";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProducts } from "@/hooks/useProductFetch";
+import { ProductsResponse } from "@/types/ApiResponse";
 
 interface TaskDialogProps {
   product_id?: string;
@@ -58,20 +59,19 @@ export default function TaskDialog({
     string | number | undefined
   >(product_id ? product_id : undefined);
 
-  // Fetch user products when dialog opens
-  useEffect(() => {
-    if (open && user?._id) {
-      fetchUserProducts().then((data) => {
-        setProducts(data.products);
-      });
-    }
-  }, [open, user]);
+  const { data, isLoading } = useProducts({});
 
-  // Initialize task form only if a product is selected
   const { formData, handleChange, mutation } = useTaskForm({
     product_id: selectedProduct as string,
     taskId,
   });
+
+  useEffect(() => {
+    if (open && user?._id && !isLoading) {
+      const productsData = (data as ProductsResponse).items;
+      setProducts(productsData || []);
+    }
+  }, [isLoading, open, data, user]);
 
   return (
     <FormDialog
@@ -87,16 +87,19 @@ export default function TaskDialog({
     >
       {/* Product Selection Dropdown */}
       {!product_id && (
-        <FormSelect
-          label="Select Product"
-          name="product"
-          value={selectedProduct as string}
-          onChange={(value) => setSelectedProduct(value)}
-          options={products.map((product) => ({
-            label: product.name,
-            value: product._id ? String(product._id) : "",
-          }))}
-        />
+        <>
+          <FormSelect
+            label="Select Product"
+            name="product"
+            value={selectedProduct as string}
+            onChange={(value) => setSelectedProduct(value)}
+            disabled={!user?._id || isLoading}
+            options={products.map((product) => ({
+              label: product.name,
+              value: product._id ? String(product._id) : "",
+            }))}
+          />
+        </>
       )}
 
       {/* Task Fields */}

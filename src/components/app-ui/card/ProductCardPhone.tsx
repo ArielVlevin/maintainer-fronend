@@ -6,10 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { List, Info } from "lucide-react";
 import DetailsDialog from "@/components/common/DetailDialog";
-import { ProductDetails } from "@/components/products/ProductDetails";
+import { ProductDetails } from "@/components/products/____ProductDetails";
 import ProductDialog from "@/components/products/ProductDialog";
 import AlertComponent from "@/components/common/AlertDialog";
-import { IProduct } from "@/types";
+import { IProduct } from "@/types/IProduct";
 import { Center } from "../Center";
 import { CardDropdownMenu } from "./CardDropDownMenu";
 

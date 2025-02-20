@@ -21,7 +21,7 @@ import { Plus } from "lucide-react";
 
 interface ProductDialogProps {
   productId?: string;
-  open: boolean; //
+  open: boolean;
   onClose: () => void;
 }
 
@@ -30,16 +30,10 @@ export default function ProductDialog({
   open,
   onClose,
 }: ProductDialogProps) {
-  // Custom hook for managing product form state and actions
-  const { formData, handleChange, mutation, imageUploadProps } = useProductForm(
-    { productId }
-  );
-  const formattedFormData = {
-    ...formData,
-    tags: Array.isArray(formData.tags)
-      ? formData.tags.join(", ")
-      : formData.tags || "",
-  };
+  const { formData, handleChange, mutation, isSubmitting, imageUploadProps } =
+    useProductForm({
+      productId,
+    });
 
   return (
     <FormDialog
@@ -47,13 +41,20 @@ export default function ProductDialog({
       open={open}
       onClose={onClose}
       onConfirm={() => {
-        mutation.mutate(); // Executes the mutation (either create or update)
-        onClose(); // Closes the dialog after submission
+        mutation.mutate();
+        onClose();
       }}
-      confirmText={productId ? "Save Changes" : "Add Product"}
+      confirmText={
+        isSubmitting
+          ? "Processing..."
+          : productId
+          ? "Save Changes"
+          : "Add Product"
+      }
+      disabled={isSubmitting} // Disable button while submitting
     >
       <ProductFields
-        formData={formattedFormData}
+        formData={formData}
         handleChange={handleChange}
         imageUploadProps={imageUploadProps}
       />

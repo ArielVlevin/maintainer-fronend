@@ -29,6 +29,7 @@ interface FormDialogProps {
   confirmText?: string;
   cancelText?: string;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
 /**
@@ -60,6 +61,7 @@ export default function FormDialog({
   confirmText = "Send",
   cancelText = "Cancel",
   children,
+  disabled = false,
 }: FormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -74,9 +76,13 @@ export default function FormDialog({
         {/* Footer with cancel and confirm buttons */}
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">{cancelText}</Button>
+            <Button disabled={disabled} variant="outline">
+              {cancelText}
+            </Button>
           </DialogClose>
-          <Button onClick={onConfirm}>{confirmText}</Button>
+          <Button disabled={disabled} onClick={onConfirm}>
+            {disabled ? "uploading..." : confirmText}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

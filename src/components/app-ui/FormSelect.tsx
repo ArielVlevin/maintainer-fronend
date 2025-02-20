@@ -28,6 +28,7 @@ interface FormSelectProps {
   onChange: (value: string | number) => void;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -59,6 +60,7 @@ export default function FormSelect({
   onChange,
   placeholder = "Select an option",
   required = true,
+  disabled = false,
   className,
 }: FormSelectProps) {
   return (
@@ -70,6 +72,7 @@ export default function FormSelect({
         value={String(value)}
         onValueChange={onChange}
         required={required}
+        disabled={disabled}
       >
         <SelectTrigger>
           <SelectValue placeholder={placeholder} />

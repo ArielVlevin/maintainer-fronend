@@ -1,131 +1,70 @@
-import { delay } from "@/lib/utils";
 import { api } from "@/api/axios";
 import { uploadImage } from "@/api/upload";
 import { IProduct } from "@/types/IProduct";
-import { ITask } from "@/types/ITask";
+import { ProductsResponse } from "@/types/ApiResponse";
 
 /**
- * Fetches a single product by its ID, including associated tasks.
+ * Fetch products from the backend with optional filters.
  *
- * @param {string} productId - The ID of the product to fetch.
- * @returns {Promise<IProduct>} The product data.
- * @throws {Error} If the request fails.
- */
-export const fetchProductById = async (
-  productId: string
-): Promise<IProduct> => {
-  try {
-    const { data } = await api.get(`/products/${productId}`);
-    return data;
-  } catch (error) {
-    console.error("❌ Error fetching product:", error);
-    throw new Error("Failed to fetch product. Please try again.");
-  }
-};
-
-/**
- * Parameters for fetching products from the API.
- */
-type FetchProductsParams = {
-  /**
-   * The page number for pagination.
-   */
-  page: number;
-
-  /**
-   * The number of products to fetch per page.
-   */
-  limit: number;
-
-  /**
-   * (Optional) A search query to filter products by name or description.
-   */
-  search?: string;
-
-  /**
-   * (Optional) A category filter to fetch only products within a specific category.
-   * If set to "all", it will not apply any category filtering.
-   */
-  category?: string;
-
-  /**
-   * (Optional) An array of field names to specify which product attributes should be returned.
-   */
-  fields?: string[];
-
-  /**
-   * (Optional) If `true`, fetch only products that belong to the currently authenticated user.
-   */
-  userOnly?: boolean;
-};
-
-/**
- * Fetches products from the API based on the given parameters.
- * Supports pagination, search, filtering, and user-specific products.
- *
- * @param {FetchProductsParams} params - The parameters for fetching products.
- * @returns {Promise<{ products: IProduct[], total: number }>} A promise that resolves to the list of products and total count.
- * @throws {Error} Throws an error if the request fails.
+ * @param {object} params - Query parameters.
+ * @returns {Promise<ProductsResponse >} The fetched products or a single product with tasks.
  */
 export const fetchProducts = async ({
-  page,
-  limit = 9,
+  productId,
+  page = 1,
+  limit = 10,
   search,
-  category,
   fields,
-  userOnly,
-}: FetchProductsParams) => {
+  category,
+  userOnly = true,
+}: {
+  productId?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  fields?: string[];
+  category?: string;
+  userOnly?: boolean;
+}): Promise<ProductsResponse | IProduct> => {
   try {
     const query = new URLSearchParams();
     query.append("page", page.toString());
     query.append("limit", limit.toString());
-
+    if (productId) query.append("productId", productId);
     if (search) query.append("search", search);
-    if (category && category !== "all") query.append("category", category);
-    if (fields && fields.length > 0) query.append("fields", fields.join(","));
+    if (fields?.length) query.append("fields", fields.join(","));
+    if (category) query.append("category", category);
     if (userOnly) query.append("userOnly", "true");
 
-    await delay(1000); // Simulated delay
+    const { data } = await api.get<{
+      success: boolean;
+      data?: IProduct;
+      items?: IProduct[];
+      total?: number;
+      page?: number;
+      totalPages?: number;
+    }>(`/products?${query.toString()}`);
 
-    const { data } = await api.get(`/products?${query.toString()}`);
-    return data;
+    if (!data.success) throw new Error("❌ Failed to fetch products.");
+
+    // ✅ החזרת נתונים לפי סוג הבקשה
+    if (productId) {
+      if (!data.data) throw new Error("❌ Product not found.");
+      return data.data; // מחזיר מוצר בודד
+    }
+
+    if (!data.items) throw new Error("❌ No products found.");
+    return {
+      items: data.items,
+      total: data.total ?? 0,
+      page: data.page ?? 1,
+      totalPages: data.totalPages ?? 1,
+    };
   } catch (error) {
     console.error("❌ Error fetching products:", error);
-    throw new Error("Failed to fetch products. Please try again.");
+    throw new Error("Failed to fetch products. Please try again later.");
   }
 };
-
-/**
- * Fetches only the products associated with the currently authenticated user.
- * This function is a wrapper around `fetchProducts`, ensuring that only the user's products are retrieved.
- *
- * @returns {Promise<{ products: IProduct[], total: number }>} A promise that resolves to the list of user-specific products and total count.
- * @throws {Error} Throws an error if the request fails.
- */
-export const fetchUserProducts = async (): Promise<{
-  products: IProduct[];
-  total: number;
-}> => fetchProducts({ page: 1, limit: 10, userOnly: true });
-
-/**
- * Fetches all tasks associated with a specific product.
- *
- * @param {string} productId - The ID of the product whose tasks should be fetched.
- * @returns {Promise<ITask[]>} An array of tasks.
- * @throws {Error} If the request fails.
- */
-export const fetchProductTasks = async (
-  productId: string
-): Promise<ITask[]> => {
-  try {
-    const { data } = await api.get(`/products/${productId}/tasks`);
-    return data;
-  } catch (error) {
-    console.error("❌ Error fetching product tasks:", error);
-    throw new Error("Failed to fetch product tasks.");
-  }
-};
-
 /**
  * Adds a new product to the database.
  *
@@ -213,3 +152,55 @@ export const fetchCategories = async (): Promise<string[]> => {
     throw new Error("Failed to fetch categories.");
   }
 };
+
+/**
+ * Fetches all tasks associated with a specific product.
+ *
+ * @param {string} productId - The ID of the product whose tasks should be fetched.
+ * @returns {Promise<ITask[]>} An array of tasks.
+ * @throws {Error} If the request fails.
+ 
+export const fetchProductTasks = async (
+  productId: string
+): Promise<ITask[]> => {
+  try {
+    const { data } = await api.get(`/products/${productId}/tasks`);
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching product tasks:", error);
+    throw new Error("Failed to fetch product tasks.");
+  }
+};
+*/
+
+/**
+ * Fetches a single product by its ID, including associated tasks.
+ *
+ * @param {string} productId - The ID of the product to fetch.
+ * @returns {Promise<IProduct>} The product data.
+ * @throws {Error} If the request fails.
+
+export const fetchProductById = async (
+  productId: string
+): Promise<IProduct> => {
+  try {
+    const { data } = await api.get(`/products/${productId}`);
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching product:", error);
+    throw new Error("Failed to fetch product. Please try again.");
+  }
+}; */
+/**
+ * Fetches only the products associated with the currently authenticated user.
+ * This function is a wrapper around `fetchProducts`, ensuring that only the user's products are retrieved.
+ *
+ * @returns {Promise<{ products: IProduct[], total: number }>} A promise that resolves to the list of user-specific products and total count.
+ * @throws {Error} Throws an error if the request fails.
+ 
+export const fetchUserProducts = async (): Promise<{
+  products: IProduct[];
+  total: number;
+}> => fetchProducts({ page: 1, limit: 10, userOnly: true });
+
+*/

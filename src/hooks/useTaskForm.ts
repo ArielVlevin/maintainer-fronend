@@ -1,4 +1,83 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useTaskActions } from "@/hooks/useTaskActions";
+import { ITask } from "@/types/ITask";
+
+interface UseTaskFormProps {
+  product_id: string;
+  taskId?: string;
+}
+
+export function useTaskForm({ product_id, taskId }: UseTaskFormProps) {
+  const router = useRouter();
+
+  // ✅ Fetch Existing Task (if editing)
+  const { tasksData, isLoading: isFetching } = useFetchData({
+    fetchTasks: !!taskId,
+    taskId,
+  });
+
+  // ✅ Initial Form State
+  const [formData, setFormData] = useState<ITask>({
+    product_id,
+    user_id: "",
+    taskName: "",
+    description: "",
+    lastMaintenance: new Date(),
+    frequency: 30,
+    nextMaintenance: new Date(),
+  });
+
+  // ✅ Populate form when editing
+  useEffect(() => {
+    if (tasksData?.data?.[0]) {
+      setFormData(tasksData?.data[0]);
+    }
+  }, [tasksData]);
+
+  // ✅ Handle Input Changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // ✅ Use `useTaskActions` for handling mutations
+  const { addMutation, updateMutation } = useTaskActions();
+
+  // ✅ Form Submit (Create or Update)
+  const mutation = useMutation({
+    mutationFn: async () => {
+      return taskId
+        ? updateMutation.mutateAsync({ taskId, updatedData: formData })
+        : addMutation.mutateAsync({
+            productId: product_id,
+            newTaskData: formData,
+          });
+    },
+    onSuccess: () => {
+      router.push(`/product/${product_id}`);
+    },
+    onError: (error) => {
+      console.error("❌ Error processing task:", error);
+    },
+  });
+
+  return {
+    formData,
+    setFormData,
+    mutation,
+    isFetching,
+    handleChange,
+  };
+}
+
 /**
+ * 
+ * 
  * `useTaskForm` Hook
  *
  * A custom React hook for managing the task form state.
@@ -38,7 +117,7 @@
  *   );
  * }
  * ```
- */
+ 
 
 "use client";
 
@@ -129,3 +208,4 @@ export function useTaskForm({ product_id, taskId }: UseTaskFormProps) {
     handleChange,
   };
 }
+*/
