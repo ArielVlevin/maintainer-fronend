@@ -7,6 +7,7 @@ import AuthGuard from "@/components/auth/AuthGuard";
 import PageHeader from "@/components/layout/PageHeader";
 import ProductListContainer from "@/features/products/ProductListContainer";
 import TaskListContainer from "@/features/tasks/TaskListContainer";
+import TaskCalendar from "@/features/calendar/TaskCalendar";
 
 const DESCRIPTION = "Here is an overview of your products and upcoming tasks";
 export default function UserAreaPage() {
@@ -26,6 +27,9 @@ export default function UserAreaPage() {
             description={DESCRIPTION}
           />
 
+          <div className="bg-white">
+            <TaskCalendar />
+          </div>
           <ProductListContainer />
           <TaskListContainer paginationControls={false} />
         </motion.div>

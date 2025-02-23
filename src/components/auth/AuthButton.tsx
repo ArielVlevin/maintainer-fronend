@@ -3,8 +3,9 @@
 import { signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { Apple, Facebook } from "lucide-react";
+import { Apple, Facebook, LogOutIcon } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AuthButtons() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +55,29 @@ export function LogoutButton() {
   return (
     <Button
       onClick={() => signOut({ callbackUrl: "/" })} // Redirect to homepage after logout
-      variant="destructive"
+      className="bg-red-600 hover:bg-red-700 text-white flex items-center"
     >
-      Logout
+      <LogOutIcon className="w-4 h-4 mr-1" /> Logout
     </Button>
+  );
+}
+
+export function SignInButton() {
+  return (
+    <Link href="/sign-in">
+      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        Sign In
+      </Button>
+    </Link>
+  );
+}
+
+export function DashBoardButton() {
+  return (
+    <Link href="/dashboard">
+      <Button className="bg-green-600 hover:bg-green-700 text-white">
+        Dashboard
+      </Button>
+    </Link>
   );
 }

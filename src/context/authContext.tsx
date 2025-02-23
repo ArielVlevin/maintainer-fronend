@@ -19,10 +19,8 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session, status } = useSession();
 
-  // ✅ אם `status === "loading"`, נמתין לטעינה
   const isSessionLoading = status === "loading";
 
-  // ✅ `useQuery` לשליפת המשתמש (עם ערך ברירת מחדל `null`)
   const {
     data,
     isLoading: isUserLoading,
@@ -33,14 +31,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!session?.user?._id) return null;
       return await fetchUserById(session.user._id);
     },
-    enabled: !!session?.user?._id && !isSessionLoading, // ✅ לא מפעיל עד שה-`session` סיים להיטען
-    staleTime: 1000 * 60 * 5, // נתונים נשמרים במטמון ל-5 דקות
+    enabled: !!session?.user?._id && !isSessionLoading,
+    staleTime: 1000 * 60 * 5,
   });
 
-  // ✅ לוודא שהמשתמש תמיד `IUser | null`
   const user: IUser | null = data ?? null;
 
-  // ✅ פונקציה לרענון המשתמש
   const refreshUser = useCallback(() => {
     refetch();
   }, [refetch]);

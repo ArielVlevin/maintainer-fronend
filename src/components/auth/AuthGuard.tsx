@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import FullScreenLoader from "../delete/___FullScreenLoading";
 import { useAuth } from "@/context/authContext";
+import FullScreenLoader from "../app-ui/FullScreenLoading";
 
 /**
  * @component AuthGuard
@@ -29,6 +29,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
     return;
   }, [user, isLoading, router]);
+
   if (isLoading) return <FullScreenLoader />;
 
   return <>{children}</>;
