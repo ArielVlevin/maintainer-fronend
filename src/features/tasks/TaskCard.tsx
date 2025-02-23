@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ITask } from "@/types/ITask";
-import AlertComponent from "../common/AlertDialog";
+import AlertComponent from "@/components/common/AlertDialog";
 import { useState } from "react";
 import TaskDialog from "./TaskDialog";
-import { CardDropdownMenu } from "../app-ui/card/CardDropDownMenu";
+import { CardDropdownMenu } from "@/components/common/CardDropDownMenu";
 
 interface TaskCardProps {
   task: ITask;

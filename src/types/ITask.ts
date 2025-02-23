@@ -11,4 +11,13 @@ export interface ITask {
   frequency: number; // Maintenance frequency in days
   nextMaintenance: Date; // Next scheduled maintenance date
   lastMaintenance: Date; // Last performed maintenance date
+
+  status: TaskStatusType;
 }
+
+export type TaskStatusType =
+  | "pending"
+  | "completed"
+  | "overdue"
+  | "inactive"
+  | "all";

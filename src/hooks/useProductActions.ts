@@ -1,47 +1,28 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteProduct, updateProduct, addProduct } from "@/api/product";
 import { IProduct } from "@/types/IProduct";
+import { useErrorHandler } from "@/context/ErrorContext";
+import { addProduct, deleteProduct, updateProduct } from "@/api/product";
 
 /**
  * Custom hook for managing product actions (delete, update, add).
- * Uses React Query's `useMutation` for caching optimizations.
- *
- * @returns {object} Mutation functions for product actions.
  */
 export const useProductActions = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useErrorHandler();
 
-  // ✅ Delete Product with Cache Update
+  // ✅ Delete Product
   const deleteMutation = useMutation({
-    mutationFn: async (productId: string) => deleteProduct(productId),
-    onMutate: async (productId) => {
-      await queryClient.cancelQueries({ queryKey: ["products"] });
-      const previousData = queryClient.getQueryData(["products"]);
-
-      queryClient.setQueryData(["products"], (oldData: any) => {
-        if (!oldData?.products) return oldData;
-        return {
-          ...oldData,
-          products: oldData.products.filter(
-            (product: IProduct) => product._id !== productId
-          ),
-          total: oldData.total - 1,
-        };
-      });
-
-      return { previousData };
-    },
+    mutationFn: (productId: string) => deleteProduct(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      showSuccess("Product deleted successfully! 🗑️");
     },
-    onError: (_error, _productId, context: any) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(["products"], context.previousData);
-      }
+    onError: () => {
+      showError("Failed to delete product.");
     },
   });
 
-  // ✅ Update Product with Image Upload
+  // ✅ Update Product
   const updateMutation = useMutation({
     mutationFn: async ({
       productId,
@@ -51,13 +32,18 @@ export const useProductActions = () => {
       productId: string;
       updatedData: IProduct;
       imageFile?: File;
-    }) => updateProduct(productId, updatedData, imageFile),
+    }) => updateProduct(productId, updatedData, imageFile), // 🛠️ שימוש בפונקציה מה-API
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      showSuccess("Product updated successfully! ✨");
+    },
+    onError: () => {
+      showError("Failed to update product.");
     },
   });
 
-  // ✅ Add Product with Image Upload
+  // ✅ Add Product
   const addMutation = useMutation({
     mutationFn: async ({
       newProductData,
@@ -65,9 +51,14 @@ export const useProductActions = () => {
     }: {
       newProductData: IProduct;
       imageFile?: File;
-    }) => addProduct(newProductData, imageFile),
+    }) => addProduct(newProductData, imageFile), // 🛠️ שימוש בפונקציה מה-API
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      showSuccess("Product added successfully! 🎉");
+    },
+    onError: () => {
+      showError("Failed to add product.");
     },
   });
 

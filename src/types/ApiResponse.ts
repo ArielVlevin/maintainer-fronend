@@ -1,12 +1,9 @@
-import { IProduct } from "./IProduct";
-import { ITask } from "./ITask";
-
 /**
- * Generic interface for paginated API responses.
+ * Generic base interface for API responses.
  *
- * @template T - Type of data being paginated.
+ * @template T - Type of data being returned.
  */
-export interface PaginatedResponse<T> {
+export interface BaseResponse<T> {
   success?: boolean; // ✅ Indicates if the request was successful
   items: T[]; // ✅ List of items
   total: number; // ✅ Total count of items in the database
@@ -14,13 +11,3 @@ export interface PaginatedResponse<T> {
   totalPages: number; // ✅ Total number of pages
   message?: string; // ✅ Optional message (for errors or additional info)
 }
-
-/**
- * Response format for fetching products with pagination.
- */
-export interface ProductsResponse extends PaginatedResponse<IProduct> {}
-
-/**
- * Response format for fetching tasks with pagination.
- */
-export interface TasksResponse extends PaginatedResponse<ITask> {}

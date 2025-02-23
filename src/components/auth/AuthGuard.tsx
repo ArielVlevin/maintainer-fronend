@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import FullScreenLoader from "../common/FullScreenLoading";
+import FullScreenLoader from "../delete/___FullScreenLoading";
 import { useAuth } from "@/context/authContext";
 
 /**

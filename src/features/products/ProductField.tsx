@@ -24,8 +24,8 @@
  * />
  */
 
-import Avatar from "../img/Avatar";
-import FormField from "../app-ui/FormField";
+import Avatar from "@/components/img/Avatar";
+import FormField from "@/components/app-ui/FormField";
 import { IProduct } from "@/types/IProduct";
 
 interface ProductFieldsProps {

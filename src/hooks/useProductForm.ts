@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { IProduct } from "@/types/IProduct";
 import { useImageUpload } from "@/hooks/use-image-upload";
-import { useProducts } from "@/hooks/useProductFetch";
+import { useProducts } from "@/hooks/useProduct";
 import { useProductActions } from "./useProductActions";
 
 interface UseProductFormProps {
@@ -22,13 +22,14 @@ export function useProductForm({ productId }: UseProductFormProps) {
   const emptyProduct: IProduct = useMemo(
     () => ({
       name: "",
+      slug: "",
       category: "",
       manufacturer: "",
       user_id: "",
       model: "",
       tags: [],
       purchaseDate: new Date(),
-      Tasks: [],
+      tasks: [],
       lastOverallMaintenance: undefined,
       nextOverallMaintenance: undefined,
     }),
@@ -46,11 +47,11 @@ export function useProductForm({ productId }: UseProductFormProps) {
 
   // ✅ Populate form when editing
   useEffect(() => {
-    if (product?.data?.[0]) {
+    if (product?.items[0]) {
       setFormData((prev) => ({
         ...prev,
-        ...product.data[0],
-        tags: Array.isArray(product.data[0].tags) ? product.data[0].tags : [],
+        ...product.items[0],
+        tags: Array.isArray(product.items[0].tags) ? product.items[0].tags : [],
       }));
     }
   }, [product]);

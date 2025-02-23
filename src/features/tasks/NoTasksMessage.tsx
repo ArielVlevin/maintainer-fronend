@@ -1,6 +1,6 @@
 import { Calendar } from "lucide-react";
-import TaskDialog from "@/components/tasks/TaskDialog";
-import { NoDataMessage } from "../app-ui/NoDataMessage";
+import TaskDialog from "@/features/tasks/TaskDialog";
+import { NoDataMessage } from "@/components/app-ui/NoDataMessage";
 
 const TITLE = "No Upcoming Tasks";
 const DESCRIPTION =

@@ -1,6 +1,6 @@
 import { Package } from "lucide-react";
-import ProductDialog from "@/components/products/ProductDialog";
-import { NoDataMessage } from "../app-ui/NoDataMessage";
+import ProductDialog from "@/features/products/ProductDialog";
+import { NoDataMessage } from "@/components/app-ui/NoDataMessage";
 
 const TITLE = "No Products Yet";
 const DESCRIPTION =

@@ -13,9 +13,9 @@
 
 import { useProductForm } from "@/hooks/useProductForm";
 import ProductFields from "./ProductField";
-import FormDialog from "../common/FormDialog";
+import FormDialog from "@/components/common/FormDialog";
 import { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 

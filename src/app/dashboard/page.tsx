@@ -3,29 +3,14 @@
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/authContext";
 import AuthGuard from "@/components/auth/AuthGuard";
-import FullScreenLoader from "@/components/common/FullScreenLoading";
 
-import { useFetchData } from "@/hooks/useFetchData";
-import TaskList from "@/components/tasks/TaskList";
-import ProductList from "@/components/products/ProductList";
 import PageHeader from "@/components/layout/PageHeader";
+import ProductListContainer from "@/features/products/ProductListContainer";
+import TaskListContainer from "@/features/tasks/TaskListContainer";
 
 const DESCRIPTION = "Here is an overview of your products and upcoming tasks";
 export default function UserAreaPage() {
   const { user, isLoading: authLoading } = useAuth();
-
-  const userName = user?.name || "Guest";
-
-  const {
-    productsData: products,
-    tasksData: tasks,
-    isLoading: fetchLoading,
-  } = useFetchData({
-    fetchProducts: true,
-    fetchTasks: true,
-  });
-
-  if (authLoading || fetchLoading) return <FullScreenLoader />;
 
   return (
     <AuthGuard>
@@ -37,12 +22,12 @@ export default function UserAreaPage() {
           className="max-w-4xl mx-auto space-y-6"
         >
           <PageHeader
-            title={`Welcome, ${userName}`}
+            title={`Welcome, ${authLoading ? "Guest" : user?.name}`}
             description={DESCRIPTION}
           />
 
-          <ProductList products={products?.items || []} />
-          {products?.total ? <TaskList tasks={tasks?.items || []} /> : null}
+          <ProductListContainer />
+          <TaskListContainer paginationControls={false} />
         </motion.div>
       </div>
     </AuthGuard>

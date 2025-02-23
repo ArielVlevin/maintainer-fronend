@@ -1,4 +1,4 @@
-import FormField from "../app-ui/FormField";
+import FormField from "@/components/app-ui/FormField";
 /**
  * `TaskFields` Component
  *
@@ -68,15 +68,14 @@ const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
         onChange={handleChange}
       />
 
-      {/* Last Maintenance Date Field */}
       <FormField
         label="Last Maintenance Date"
         type="date"
         name="lastMaintenance"
         value={
-          typeof formData.lastMaintenance === "string"
-            ? formData.lastMaintenance
-            : formData.lastMaintenance.toISOString().split("T")[0]
+          formData.lastMaintenance
+            ? new Date(formData.lastMaintenance).toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0]
         }
         onChange={handleChange}
         required

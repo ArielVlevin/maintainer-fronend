@@ -1,6 +1,8 @@
-import { ProductsResponse, TasksResponse } from "@/types/ApiResponse";
-import { useProducts } from "./useProductFetch";
-import { useTasks } from "./useTaskFetch";
+import { BaseResponse } from "@/types/ApiResponse";
+import { useProducts } from "./useProduct";
+import { useTasks } from "./useTask";
+import { IProduct } from "@/types/IProduct";
+import { ITask } from "@/types/ITask";
 
 interface FetchDataParams {
   fetchProducts?: boolean;
@@ -66,9 +68,9 @@ export const useFetchData = ({
 
   return {
     productsData: fetchProducts
-      ? (productsData as ProductsResponse)
+      ? (productsData as BaseResponse<IProduct>)
       : undefined,
-    tasksData: fetchTasks ? (tasksData as TasksResponse) : undefined,
+    tasksData: fetchTasks ? (tasksData as BaseResponse<ITask>) : undefined,
     isLoading: isProductsLoading || isTasksLoading,
     isError: isProductsError || isTasksError,
   };

@@ -1,4 +1,5 @@
 import { fetchProducts } from "@/api/product";
+import { useErrorHandler } from "@/context/ErrorContext";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -10,15 +11,17 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useProducts = ({
   productId,
+  slug,
   page = 1,
   limit = 10,
   search,
   fields,
   category,
-  userOnly = false,
+  userOnly = true,
   enabled = true,
 }: {
   productId?: string;
+  slug?: string;
   page?: number;
   limit?: number;
   search?: string;
@@ -27,10 +30,13 @@ export const useProducts = ({
   userOnly?: boolean;
   enabled?: boolean;
 }) => {
+  const { showError } = useErrorHandler();
+
   return useQuery({
     queryKey: [
       "products",
       productId,
+      slug,
       page,
       limit,
       search,
@@ -38,9 +44,25 @@ export const useProducts = ({
       category,
       userOnly,
     ],
-    queryFn: () =>
-      fetchProducts({ productId, page, limit, search, category, userOnly }),
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    enabled: !!productId || enabled, // Ensure execution when necessary
+    queryFn: async () => {
+      try {
+        return await fetchProducts({
+          productId,
+          slug,
+          search,
+          fields,
+          category,
+          page,
+          limit,
+          userOnly,
+        });
+      } catch (error: any) {
+        console.error("❌ Error fetching products:", error);
+        showError(error.message || "Failed to load products.");
+        throw error; //
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: !!productId || enabled,
   });
 };

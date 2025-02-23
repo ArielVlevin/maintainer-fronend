@@ -27,18 +27,17 @@
 "use client";
 
 import { useTaskForm } from "@/hooks/useTaskForm";
-import FormDialog from "../common/FormDialog";
+import FormDialog from "@/components/common/FormDialog";
 import TaskFields from "./TaskField";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/authContext";
 import { IProduct } from "@/types/IProduct";
 
-import FormSelect from "../app-ui/FormSelect";
-import { Button } from "../ui/button";
+import FormSelect from "@/components/app-ui/FormSelect";
+import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useProducts } from "@/hooks/useProductFetch";
-import { ProductsResponse } from "@/types/ApiResponse";
+import { useProducts } from "@/hooks/useProduct";
 
 interface TaskDialogProps {
   product_id?: string;
@@ -68,7 +67,7 @@ export default function TaskDialog({
 
   useEffect(() => {
     if (open && user?._id && !isLoading) {
-      const productsData = (data as ProductsResponse).items;
+      const productsData = data?.items;
       setProducts(productsData || []);
     }
   }, [isLoading, open, data, user]);

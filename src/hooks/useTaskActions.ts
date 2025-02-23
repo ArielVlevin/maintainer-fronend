@@ -1,83 +1,103 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteTask, updateTask, addTask } from "@/api/tasks";
 import { ITask } from "@/types/ITask";
+import { useErrorHandler } from "@/context/ErrorContext";
+import {
+  addTask,
+  deleteTask,
+  markTaskAsDone,
+  postponeTask,
+  updateTask,
+} from "@/api/tasks";
 
 /**
  * Custom hook for managing task actions (delete, update, add).
- * Uses React Query's `useMutation` for caching optimizations.
- *
- * @returns {object} Mutation functions for task actions.
  */
 export const useTaskActions = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useErrorHandler();
 
-  // ✅ מחיקת משימה עם עדכון המטמון
+  // ✅ Delete Task
   const deleteMutation = useMutation({
-    mutationFn: (taskId: string) => deleteTask(taskId),
-    onMutate: async (taskId) => {
-      await queryClient.cancelQueries({ queryKey: ["fetchData", false, true] });
-      const previousData = queryClient.getQueryData(["fetchData", false, true]);
-
-      queryClient.setQueryData(["fetchData", false, true], (oldData: any) => {
-        if (!oldData || !oldData.tasksData) return oldData;
-        return {
-          ...oldData,
-          tasksData: {
-            ...oldData.tasksData,
-            tasks: oldData.tasksData.tasks.filter(
-              (task: any) => task._id !== taskId
-            ),
-            total: oldData.tasksData.total - 1,
-          },
-        };
-      });
-
-      return { previousData };
-    },
+    mutationFn: async (taskId: string) => deleteTask(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchData", false, true] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      showSuccess("Task deleted successfully! 🗑️");
     },
-    onError: (_error, _taskId, context: any) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(
-          ["fetchData", false, true],
-          context.previousData
-        );
-      }
+    onError: () => {
+      showError("Failed to delete task.");
     },
   });
 
-  // ✅ עדכון משימה עם עדכון מטמון
+  // ✅ Update Task
   const updateMutation = useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       taskId,
       updatedData,
     }: {
       taskId: string;
-      updatedData: any;
+      updatedData: ITask;
     }) => updateTask(taskId, updatedData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchData", false, true] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      showSuccess("Task updated successfully! ✨");
+    },
+    onError: () => {
+      showError("Failed to update task.");
     },
   });
 
-  // ✅ הוספת משימה עם עדכון מטמון
   const addMutation = useMutation({
-    mutationFn: ({
-      productId,
+    mutationFn: async ({
+      product_id,
       newTaskData,
     }: {
-      productId: string;
+      product_id: string;
       newTaskData: ITask;
-    }) => addTask(productId, newTaskData),
+    }) => addTask(product_id, newTaskData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchData", false, true] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      showSuccess("Task added successfully! 🎉");
+    },
+    onError: () => {
+      showError("Failed to add task.");
     },
   });
 
+  const completeTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => markTaskAsDone(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      showSuccess("Task completed successfully! ✅");
+    },
+    onError: (error: any) => {
+      showError(error.message || "Failed to complete task.");
+    },
+  });
+
+  /**
+   * Mutation for postponing a task.
+   *
+   * @returns {object} Mutation object to handle postponing tasks.
+   *
+   * @example
+   * postponeTaskMutation.mutate({ taskId: "task123", days: 3 });
+   */
+  const postponeTaskMutation = useMutation({
+    mutationFn: async ({ taskId, days }: { taskId: string; days: number }) =>
+      postponeTask(taskId, days),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      showSuccess("Task postponed successfully!");
+    },
+    onError: () => {
+      showError("Failed to postpone task.");
+    },
+  });
   return {
     deleteMutation,
     updateMutation,
     addMutation,
+    completeTaskMutation,
+    postponeTaskMutation,
   };
 };

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProducts } from "@/api/product"; // Fetch function for products
+import { fetchProducts } from "@/api/___product"; // Fetch function for products
 import {
   CommandDialog,
   CommandEmpty,

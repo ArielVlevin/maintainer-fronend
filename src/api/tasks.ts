@@ -1,18 +1,13 @@
 import { api } from "@/api/axios";
-import { TasksResponse } from "@/types/ApiResponse";
+import { BaseResponse } from "@/types/ApiResponse";
 import { ITask } from "@/types/ITask";
+import { createItem, updateItem, deleteItem } from "@/api/baseApi";
 
 /**
- * Fetch tasks from the API based on provided filters.
+ * Fetch a paginated list of tasks.
  *
- * @param {object} params - Query parameters.
- * @param {string} [params.taskId] - Fetch a specific task by ID.
- * @param {string} [params.productId] - Fetch tasks for a specific product.
- * @param {string} [params.search] - Search term to filter tasks.
- * @param {string} [params.status] - Filter tasks by status.
- * @param {number} [params.page=1] - Pagination: current page.
- * @param {number} [params.limit=10] - Number of tasks per page.
- * @returns {Promise<TasksResponse>} - A promise that resolves to the task data.
+ * @param {object} params - Query parameters for filtering tasks.
+ * @returns {Promise<BaseResponse<ITask>>} - List of tasks with pagination data.
  */
 export const fetchTasks = async ({
   taskId,
@@ -25,161 +20,95 @@ export const fetchTasks = async ({
   taskId?: string;
   productId?: string;
   search?: string;
-  status?: string;
+  status?: "pending" | "completed" | "overdue";
   page?: number;
   limit?: number;
-}): Promise<TasksResponse | ITask> => {
+}): Promise<BaseResponse<ITask>> => {
   try {
-    const query = new URLSearchParams();
-    query.append("page", page.toString());
-    query.append("limit", limit.toString());
-    if (taskId) query.append("taskId", taskId);
-    if (productId) query.append("productId", productId);
-    if (status) query.append("status", status);
-    if (search) query.append("search", search);
+    const response = await api.get<BaseResponse<ITask>>("/tasks", {
+      params: { taskId, productId, search, status, page, limit },
+    });
 
-    console.log("hiiii");
-    const { data } = await api.get<{
-      success: boolean;
-      data?: ITask;
-      items?: ITask[];
-      total?: number;
-      page?: number;
-      totalPages?: number;
-    }>(`/tasks?${query.toString()}`);
-
-    // ✅ Ensure request was successful
-    if (!data.success) {
-      throw new Error("❌ Failed to fetch tasks.");
-    }
-
-    // ✅ If fetching a single task
-    if (taskId) {
-      if (!data.data) throw new Error("❌ Task not found.");
-      return data.data; // Returning a single task
-    }
-
-    // ✅ If fetching multiple tasks
-    if (!data.items) throw new Error("❌ No tasks found.");
-    return {
-      items: data.items,
-      total: data.total ?? 0,
-      page: data.page ?? 1,
-      totalPages: data.totalPages ?? 1,
-    };
+    return response.data;
   } catch (error) {
     console.error("❌ Error fetching tasks:", error);
-    throw new Error("Failed to fetch tasks. Please try again later.");
+    throw new Error("Failed to fetch tasks.");
   }
 };
 
 /**
- * Adds a new maintenance task to a specific product.
+ * Adds a new task to a specific product in the database.
  *
  * @param {string} product_id - The ID of the product to which the task belongs.
  * @param {ITask} task - The task details.
  * @returns {Promise<ITask>} A promise that resolves to the newly created task.
  * @throws {Error} If the request fails.
+ *
+ * @example
+ * const newTask = await addTask("product123", { taskName: "Clean Filter", frequency: 7 });
  */
-export const addTask = async (product_id: string, task: ITask) => {
-  try {
-    const { data } = await api.post(`/tasks/${product_id}`, {
-      ...task,
-      product_id,
-    });
-    return data;
-  } catch (error) {
-    console.error("❌ Error adding task:", error);
-    throw new Error("Failed to add task.");
-  }
-};
+export const addTask = (product_id: string, task: ITask) =>
+  createItem<ITask>(`/tasks/${product_id}`, task);
 
 /**
- * Updates an existing maintenance task by its ID.
+ * Updates an existing task.
  *
  * @param {string} taskId - The ID of the task to update.
- * @param {ITask} updatedTaskData - The updated task details.
+ * @param {ITask} updatedData - The updated task details.
  * @returns {Promise<ITask>} A promise that resolves to the updated task.
  * @throws {Error} If the request fails.
+ *
+ * @example
+ * const updatedTask = await updateTask("task123", { taskName: "Replace Filter" });
  */
-export const updateTask = async (
-  taskId: string,
-  updatedTaskData: ITask
-): Promise<ITask> => {
-  try {
-    const { data } = await api.put(`/tasks/${taskId}`, updatedTaskData);
-    return data;
-  } catch (error) {
-    console.error("❌ Error updating task:", error);
-    throw new Error("Failed to update task.");
-  }
-};
+export const updateTask = (taskId: string, updatedData: ITask) =>
+  updateItem<ITask>("/tasks", taskId, updatedData);
 
 /**
- * Deletes a maintenance task by its ID.
+ * Deletes a task from the database.
  *
  * @param {string} taskId - The ID of the task to delete.
+ * @returns {Promise<void>} A promise that resolves when the task is successfully deleted.
  * @throws {Error} If the request fails.
+ *
+ * @example
+ * await deleteTask("task123");
  */
-export const deleteTask = async (taskId: string) => {
+export const deleteTask = (taskId: string) => deleteItem("/tasks", taskId);
+
+/**
+ * Mark a task as completed.
+ *
+ * @param {string} taskId - The ID of the task to mark as completed.
+ * @returns {Promise<void>} - Resolves when the task is successfully updated.
+ */
+export const markTaskAsDone = async (taskId: string): Promise<void> => {
   try {
-    await api.delete(`/tasks/${taskId}`);
+    await api.patch(`/tasks/${taskId}/complete`);
   } catch (error) {
-    console.error("❌ Error deleting task:", error);
-    throw new Error("Failed to delete task.");
+    console.error("❌ Error completing task:", error);
+    throw new Error("Failed to complete task.");
   }
 };
 
 /**
- * Fetches all maintenance tasks for a specific product.
+ * Postpone a task by a given number of days.
  *
- * @param {string} productId - The ID of the product whose tasks should be retrieved.
- * @returns {Promise<ITask[]>} A promise that resolves to an array of tasks.
+ * @param {string} taskId - The ID of the task to postpone.
+ * @param {number} days - The number of days to postpone the task.
+ * @returns {Promise<{ success: boolean; message: string; task?: ITask }>} - The updated task and success message.
  * @throws {Error} If the request fails.
- 
-export const fetchProductTasks = async (
-  productId: string
-): Promise<ITask[]> => {
+ *
+ * @example
+ * const response = await postponeTask("task123", 5);
+ * console.log(response.message); // "Task postponed by 5 days"
+ */
+export const postponeTask = async (taskId: string, days: number) => {
   try {
-    const { data } = await api.get(`/products/${productId}/tasks`);
+    const { data } = await api.patch(`/tasks/${taskId}/postpone`, { days });
     return data;
   } catch (error) {
-    console.error("❌ Error fetching product tasks:", error);
-    throw new Error("Failed to fetch product tasks.");
+    console.error("❌ Error postponing task:", error);
+    throw new Error("Failed to postpone task.");
   }
 };
-
-/**
- * Fetches a maintenance task by its ID.
- *
- * @param {string} taskId - The ID of the task to fetch.
- * @returns {Promise<ITask>} A promise that resolves to the requested task.
- * @throws {Error} If the request fails.
- 
-export const fetchTaskById = async (taskId: string): Promise<ITask> => {
-  try {
-    const { data } = await api.get(`/tasks/${taskId}`);
-    return data;
-  } catch (error) {
-    console.error("❌ Error fetching task:", error);
-    throw new Error("Failed to fetch task.");
-  }
-};
-/**
- * Fetches all maintenance tasks for the logged-in user.
- *
- * @param {string} userId - The ID of the user.
- * @returns {Promise<ITask[]>} A promise resolving to an array of user-specific tasks.
- * @throws {Error} If the request fails.
- 
-export const fetchUserTasks = async (userId: string): Promise<ITask[]> => {
-  try {
-    const { data } = await api.get(`/tasks?user_id=${userId}`);
-    return data;
-  } catch (error) {
-    console.error("❌ Error fetching user tasks:", error);
-    throw new Error("Failed to fetch tasks.");
-  }
-};
-
-*/
