@@ -4,8 +4,8 @@ import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import AuthGuard from "@/components/auth/AuthGuard";
-import { useProducts } from "@/hooks/useProduct";
-import TaskListContainer from "@/features/tasks/TaskListContainer";
+import { useProducts } from "@/modules/products/hooks/useProduct";
+import TaskListContainer from "@/modules/tasks/components/TaskListContainer";
 
 export default function ProductPage() {
   const { id } = useParams() as { id: string };

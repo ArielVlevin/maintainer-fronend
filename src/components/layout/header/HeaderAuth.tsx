@@ -4,25 +4,27 @@ import {
   SignInButton,
 } from "@/components/auth/AuthButton";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/authContext";
-import { usePathname } from "next/navigation";
+import { isProtectedPage } from "@/config/navLinks";
 
-export function HeaderAuth() {
-  const pathname = usePathname();
-
-  const { user, isLoading } = useAuth();
-
+export function HeaderAuth({
+  pathname,
+  isUser,
+  isLoading,
+}: {
+  pathname: string;
+  isUser: boolean;
+  isLoading: boolean;
+}) {
   if (isLoading)
     return (
-      <Button className="bg-gray-600 hover:bg-gray-700 text-white">
-        Loading...
+      <Button disabled className="bg-gray-600 hover:bg-gray-700 text-white">
+        Login
       </Button>
     );
-  if (user) {
+  if (isUser) {
     return (
       <>
-        {pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/product") ? (
+        {isProtectedPage(pathname) ? (
           <div className="flex items-center gap-3">
             <DashBoardButton />
             <LogoutButton />

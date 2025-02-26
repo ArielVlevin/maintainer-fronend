@@ -85,13 +85,9 @@ export const authOptions: NextAuthOptions = {
     }) {
       if (user) {
         //first log-in
-
         token._id = user.id || user._id || token.sub;
         token.name = user.name;
         token.email = user.email;
-        // token.image = user.image;
-        //token.emailVerified = user.emailVerified;
-
         token.accessToken = jwt.sign(
           { _id: user.id, email: user.email },
           JWT_SECRET,
@@ -115,7 +111,6 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.accessToken = token.accessToken;
-        //  session.user.profileCompleted = token.profileCompleted as boolean; // ✅ שולח ל-Frontend
       }
       return session;
     },

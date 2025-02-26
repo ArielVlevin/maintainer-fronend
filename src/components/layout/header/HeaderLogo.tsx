@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { PenToolIcon as Tool } from "lucide-react";
+import { isProtectedPage } from "@/config/navLinks";
 
-export function HeaderLogo() {
-  const pathname = usePathname();
-
+export function HeaderLogo({ pathname }: { pathname: string }) {
   return (
     <span className="font-bold text-blue-600 dark:text-blue-400 flex gap-2">
       <Link
@@ -16,16 +14,15 @@ export function HeaderLogo() {
 
         <>MaintenancePro</>
       </Link>
-      {pathname.startsWith("/dashboard") ||
-        (pathname.startsWith("/product") && (
-          <Link
-            className="flex items-center justify-center"
-            href="/dashboard"
-            aria-label="Go to homepage"
-          >
-            | Dashboard
-          </Link>
-        ))}
+      {isProtectedPage(pathname) ? (
+        <Link
+          className="flex items-center justify-center"
+          href="/dashboard"
+          aria-label="Go to homepage"
+        >
+          | Dashboard
+        </Link>
+      ) : null}
     </span>
   );
 }

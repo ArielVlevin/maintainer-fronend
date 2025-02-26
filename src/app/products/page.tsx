@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { Badge } from "@/components/ui/badge";
-import ProductListContainer from "@/features/products/ProductListContainer";
+import ProductListContainer from "@/modules/products/components/ProductListContainer";
 export default function ProductsPage() {
   return (
     <AuthGuard>
