@@ -41,6 +41,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     refetch();
   }, [refetch]);
 
+  /*
+  useEffect(() => {
+    if (!isSessionLoading && !isUserLoading)
+      if (!user) {
+        router.replace("/sign-in");
+      } else if (!user.profileCompleted) {
+        router.replace("/dashboard/complete-profile");
+      } else if (!user.emailVerified) {
+        router.replace("/auth/EmailVerification");
+      }
+  }, [user, isSessionLoading, isUserLoading, isEmailVerified, router]);
+*/
+
   return (
     <AuthContext.Provider
       value={{

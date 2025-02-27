@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IProduct } from "@/types/IProduct";
-import { useErrorHandler } from "@/context/ErrorContext";
 import { addProduct, deleteProduct, updateProduct } from "@/api/product";
+import { useNotification } from "@/context/NotificationContext";
 
 /**
  * Custom hook for managing product actions (delete, update, add).
  */
 export const useProductActions = () => {
   const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorHandler();
+  const { showError, showSuccess } = useNotification();
 
   // ✅ Delete Product
   const deleteMutation = useMutation({

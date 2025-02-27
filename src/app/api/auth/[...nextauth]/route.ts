@@ -2,8 +2,9 @@ import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import jwt from "jsonwebtoken";
 import { JWT } from "next-auth/jwt";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb";
+//import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
+//import clientPromise from "@/lib/mongodb";
+import { verifyUser } from "@/api/auth";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -37,7 +38,7 @@ export const authOptions: NextAuthOptions = {
    * Database adapter for managing authentication sessions.
    * Uses MongoDB to store user sessions.
    */
-  adapter: MongoDBAdapter(clientPromise),
+  //adapter: MongoDBAdapter(clientPromise),
 
   /**
    * Authentication providers.
@@ -58,48 +59,54 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  /**
+   * Secret key used for JWT encryption.
+   * This should be set in environment variables for security.
+   */
+  secret: process.env.NEXTAUTH_SECRET,
 
   /**
    * Callback functions for customizing authentication behavior.
    */
   callbacks: {
     /**
-     * Handles JWT token generation.
-     * - If the user logs in, generates a **custom JWT** containing user details.
-     * - Stores id, email, and role inside the token.
-     * - Token expires in 7 days.
+     * Handles JWT token creation and user verification with backend.
      *
      * @param {JWT} token - The existing JWT token.
      * @param {any} user - The authenticated user object (available on first login).
      * @param {any} account - The account information (OAuth provider details).
-     * @returns {JWT} - Updated token with the access token.
+     * @returns {JWT} - Updated token with user details from backend.
      */
-    async jwt({
-      token,
-      user,
-      account,
-    }: {
-      token: JWT;
-      user?: any;
-      account?: any;
-    }) {
+    async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) {
-        //first log-in
-        token._id = user.id || user._id || token.sub;
-        token.name = user.name;
-        token.email = user.email;
-        token.accessToken = jwt.sign(
-          { _id: user.id, email: user.email },
-          JWT_SECRET,
-          { expiresIn: "7d" }
-        );
+        // First login, send the user's email to backend for verification
+        try {
+          if (!user.email)
+            throw new Error("❌ User email is missing from OAuth provider.");
+
+          const response = await verifyUser({
+            email: user.email,
+            name: user.name || "",
+          });
+          // Save user details in the token
+          token._id = response._id;
+          token.name = response.name;
+          token.email = response.email;
+          token.accessToken = jwt.sign(
+            { _id: response._id, email: response.email },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+          );
+        } catch (error) {
+          console.error("❌ Error verifying user with backend:", error);
+          throw new Error("Failed to verify user.");
+        }
       }
       return token;
     },
 
     /**
      * Adds the JWT access token to the session object.
-     * This token is used for authenticated API requests from the frontend.
      *
      * @param {Session} session - The user session object.
      * @param {JWT} token - The JWT token containing user data.
@@ -115,12 +122,6 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-
-  /**
-   * Secret key used for JWT encryption.
-   * This should be set in environment variables for security.
-   */
-  secret: JWT_SECRET,
 };
 
 /**

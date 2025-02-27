@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import TaskList from "./TaskList";
-import { useErrorHandler } from "@/context/ErrorContext";
 import TaskListSkeleton from "../styles/TaskListSkeleton";
 import { useTasks } from "@/modules/tasks/hooks/useTask";
 import { NoTasksMessage } from "./NoTasksMessage";
@@ -12,6 +11,7 @@ import { useTaskActions } from "@/modules/tasks/hooks/useTaskActions";
 import { PostponeTaskDialog } from "../dialogs/PostponeTaskDialog";
 import { IProduct } from "@/types/IProduct";
 import TaskDialog, { AddTaskButton } from "../dialogs/TaskDialog";
+import { useNotification } from "@/context/NotificationContext";
 
 /**
  * @component TaskListContainer
@@ -33,7 +33,7 @@ export default function TaskListContainer({
 }) {
   const [page, setPage] = useState(1);
   const limit = 10; // Number of tasks per page
-  const { showError } = useErrorHandler();
+  const { showError } = useNotification();
 
   const { data, isLoading, isError, error } = useTasks({
     productId: product?._id,

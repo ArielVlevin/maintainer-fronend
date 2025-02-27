@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ITask } from "@/types/ITask";
-import { useErrorHandler } from "@/context/ErrorContext";
 import {
   addTask,
   deleteTask,
@@ -8,13 +7,14 @@ import {
   postponeTask,
   updateTask,
 } from "@/api/tasks";
+import { useNotification } from "@/context/NotificationContext";
 
 /**
  * Custom hook for managing task actions (delete, update, add).
  */
 export const useTaskActions = () => {
   const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorHandler();
+  const { showError, showSuccess } = useNotification();
 
   // ✅ Delete Task
   const deleteMutation = useMutation({
@@ -72,7 +72,7 @@ export const useTaskActions = () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       showSuccess("Task completed successfully! ✅");
     },
-    onError: (error: any) => {
+    onError: (error) => {
       showError(error.message || "Failed to complete task.");
     },
   });

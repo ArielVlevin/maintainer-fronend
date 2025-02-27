@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTasks } from "@/api/tasks";
-import { useErrorHandler } from "@/context/ErrorContext";
+import { useNotification } from "@/context/NotificationContext";
 
 /**
  * Custom React Query hook for fetching tasks.
@@ -25,7 +25,7 @@ export const useTasks = ({
   limit?: number;
   enabled?: boolean;
 }) => {
-  const { showError } = useErrorHandler();
+  const { showError } = useNotification();
 
   return useQuery({
     queryKey: ["tasks", taskId, productId, search, status, page, limit],
@@ -39,9 +39,9 @@ export const useTasks = ({
           page,
           limit,
         });
-      } catch (error: any) {
+      } catch (error) {
         console.error("❌ Error fetching tasks:", error);
-        showError(error.message || "Failed to load tasks.");
+        showError((error as Error).message || "Failed to load tasks.");
         throw error;
       }
     },

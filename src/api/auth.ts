@@ -1,6 +1,5 @@
 import { api } from "@/api/axios";
 import { IUser } from "@/types/IUser";
-import { getSession } from "next-auth/react";
 
 /**
  * Verifies if the user exists in the backend. If not, it creates a new user.
@@ -13,39 +12,61 @@ import { getSession } from "next-auth/react";
  * @throws {Error} If the request fails.
  */
 export const verifyUser = async ({
-  _id,
-  name,
   email,
+  name,
 }: {
-  _id: string;
-  name: string;
   email: string;
+  name: string;
 }): Promise<IUser> => {
+  if (!name || !email) throw new Error("❌ User data is missing.");
+
   try {
-    const session = await getSession(); // ✅ קבלת ה-JWT המאומת מה-Session
+    const response = await api.post("/auth/verify-user", {
+      name,
+      email,
+    });
 
-    if (!session?.user?.accessToken) {
-      throw new Error("No access token available. Please log in again.");
-    }
+    console.log("✅ Backend response:", response.data);
 
-    const response = await api.post(
-      "/auth/verify-user", // ✅ וידוא שהתוואי תואם ל-Backend
-      {
-        _id,
-        name,
-        email,
-      }
-      //    {
-      //      headers: {
-      //        Authorization: `Bearer ${session.user.accessToken}`, // ✅ שליחת ה-JWT לאימות
-      //       },
-      //     }
-    );
+    if (!response.data || !response.data.user)
+      throw new Error("❌ Invalid response from backend.");
 
     return response.data.user;
   } catch (error) {
-    console.error("❌ Error verifying user in backend:", error);
+    console.error("❌ Error verifying user in backend: ", error);
     throw new Error("Failed to verify user.");
+  }
+};
+
+/**
+ * Updates user information (name & email) in the backend.
+ *
+ * @param {Object} userData - User information to update.
+ * @param {string} userData.name - The new name of the user.
+ * @param {string} userData.email - The new email of the user.
+ * @returns {Promise<void>} - Resolves when the user update is complete.
+ * @throws {Error} If the request fails.
+ */
+export const updateUser = async ({
+  name,
+  email,
+}: {
+  name: string;
+  email: string;
+}): Promise<void> => {
+  try {
+    const response = await api.post("/auth/update-user", {
+      name,
+      email,
+    });
+
+    if (!response.data.success)
+      throw new Error(response.data.message || "Failed to update user");
+
+    console.log("✅ User profile updated successfully");
+  } catch (error) {
+    console.error("❌ Error updating user profile:", error);
+    throw new Error("Failed to update user.");
   }
 };
 
@@ -55,6 +76,30 @@ export const fetchUserById = async (_id: string): Promise<IUser | null> => {
     return response.data;
   } catch (error) {
     console.error("❌ Failed to fetch user:", error);
-    return null;
+    throw new Error("Failed to fetch user.");
   }
 };
+
+export async function sendVerificationEmail() {
+  try {
+    const response = await api.post("/auth/send-verification-email");
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to send verification Email:", error);
+    throw new Error("Failed to send verification Email.");
+  }
+}
+
+export async function verifyEmail(token: string) {
+  try {
+    const response = await api.post("/auth/verify-email", { token });
+    if (!response.data.success) {
+      console.log("⚠️ Verification failed:", response.data.message);
+      return { success: false, message: response.data.message };
+    }
+    return response.data;
+  } catch (error) {
+    console.error("❌ Failed to verify Email:", error);
+    throw new Error("Failed to verify Email.");
+  }
+}

@@ -3,7 +3,7 @@
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
 
-interface ErrorHandlerContextType {
+interface NotificationContextType {
   showError: (message: string) => void;
   showSuccess: (message: string) => void;
 }
@@ -11,14 +11,14 @@ interface ErrorHandlerContextType {
 /**
  * Context for managing global error and success notifications.
  */
-const ErrorHandlerContext = createContext<ErrorHandlerContextType | undefined>(
+const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined
 );
 
 /**
  * Provides error and success handling using react-toastify.
  */
-export const ErrorHandlerProvider = ({
+export const NotificationProvider = ({
   children,
 }: {
   children: React.ReactNode;
@@ -46,21 +46,21 @@ export const ErrorHandlerProvider = ({
   };
 
   return (
-    <ErrorHandlerContext.Provider value={{ showError, showSuccess }}>
+    <NotificationContext.Provider value={{ showError, showSuccess }}>
       {children}
-    </ErrorHandlerContext.Provider>
+    </NotificationContext.Provider>
   );
 };
 
 /**
  * Hook for accessing the error handler.
  */
-export const useErrorHandler = () => {
-  const context = useContext(ErrorHandlerContext);
-  if (!context) {
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  if (!context)
     throw new Error(
-      "useErrorHandler must be used within an ErrorHandlerProvider"
+      "useNotification must be used within an NotificationProvider"
     );
-  }
+
   return context;
 };

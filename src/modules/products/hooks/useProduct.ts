@@ -1,5 +1,5 @@
 import { fetchProducts } from "@/api/product";
-import { useErrorHandler } from "@/context/ErrorContext";
+import { useNotification } from "@/context/NotificationContext";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -30,7 +30,7 @@ export const useProducts = ({
   userOnly?: boolean;
   enabled?: boolean;
 }) => {
-  const { showError } = useErrorHandler();
+  const { showError } = useNotification();
 
   return useQuery({
     queryKey: [
@@ -56,10 +56,10 @@ export const useProducts = ({
           limit,
           userOnly,
         });
-      } catch (error: any) {
+      } catch (error) {
         console.error("❌ Error fetching products:", error);
-        showError(error.message || "Failed to load products.");
-        throw error; //
+        showError((error as Error).message || "Failed to load products.");
+        throw error;
       }
     },
     staleTime: 1000 * 60 * 5,

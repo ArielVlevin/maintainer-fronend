@@ -10,7 +10,7 @@ import TaskListContainer from "@/modules/tasks/components/TaskListContainer";
 
 const DESCRIPTION = "Here is an overview of your products and upcoming tasks";
 export default function UserAreaPage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
 
   return (
     <AuthGuard>
@@ -22,10 +22,9 @@ export default function UserAreaPage() {
           className="max-w-4xl mx-auto space-y-6"
         >
           <PageHeader
-            title={`Welcome, ${authLoading ? "Guest" : user?.name}`}
+            title={`Welcome, ${user?.name}`}
             description={DESCRIPTION}
           />
-
           <ProductListContainer />
           <TaskListContainer paginationControls={false} />
         </motion.div>

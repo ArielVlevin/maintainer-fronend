@@ -10,14 +10,14 @@ import { useProducts } from "@/modules/products/hooks/useProduct";
 import ProductListSkeleton from "../styles/ProductListSkeleton";
 import { NoProductsMessage } from "./NoProductsMessage";
 import { IProduct } from "@/types/IProduct";
-import { useErrorHandler } from "@/context/ErrorContext";
+import { useNotification } from "@/context/NotificationContext";
 
 /**
  * @component ProductListContainer
  * @description Manages API calls and state for `ProductList`.
  */
 export default function ProductListContainer() {
-  const { showError } = useErrorHandler();
+  const { showError } = useNotification();
 
   const { data, isLoading, isError, error } = useProducts({});
   const { deleteMutation } = useProductActions();
