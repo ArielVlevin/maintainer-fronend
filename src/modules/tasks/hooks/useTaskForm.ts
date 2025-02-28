@@ -10,25 +10,25 @@ import { useProducts } from "../../products/hooks/useProduct";
 
 interface UseTaskFormProps {
   product_id: string;
-  taskId?: string;
+  task_id?: string;
   date?: Date;
 }
 
-export function useTaskForm({ product_id, taskId, date }: UseTaskFormProps) {
+export function useTaskForm({ product_id, task_id, date }: UseTaskFormProps) {
   const { addMutation, updateMutation } = useTaskActions();
   const router = useRouter();
   const { id: currectPage } = useParams() as { id: string };
 
   // Fetch Existing Task (if editing)
   const { data, isLoading: taskIsLoading } = useTasks({
-    taskId,
-    enabled: !!taskId,
+    task_id,
+    enabled: !!task_id,
   });
   const {
     data: product,
     isLoading: productIsLoading,
     error: productError,
-  } = useProducts({ productId: product_id });
+  } = useProducts({ product_id: product_id });
 
   const emptyTask: ITask = useMemo(
     () => ({
@@ -47,9 +47,9 @@ export function useTaskForm({ product_id, taskId, date }: UseTaskFormProps) {
   const [formData, setFormData] = useState<ITask>(emptyTask);
 
   useEffect(() => {
-    if (!taskId) setFormData(emptyTask);
+    if (!task_id) setFormData(emptyTask);
     else if (data?.items[0]) setFormData(data.items[0]);
-  }, [taskId, data, emptyTask]);
+  }, [task_id, data, emptyTask]);
 
   //  Handle Input Changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,8 +60,8 @@ export function useTaskForm({ product_id, taskId, date }: UseTaskFormProps) {
   // Form Submit (Create or Update)
   const mutation = useMutation({
     mutationFn: async () => {
-      return taskId
-        ? updateMutation.mutateAsync({ taskId, updatedData: formData })
+      return task_id
+        ? updateMutation.mutateAsync({ task_id, updatedData: formData })
         : addMutation.mutateAsync({ product_id, newTaskData: formData });
     },
     onSuccess: () => {

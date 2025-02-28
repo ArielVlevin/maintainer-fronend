@@ -1,3 +1,4 @@
+import { ApiResponse } from "@/types/ApiResponse";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { getSession, signOut } from "next-auth/react";
 
@@ -75,13 +76,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T | null;
-  error?: string;
-}
 
 export const apiClient = async <T>(
   endpoint: string,

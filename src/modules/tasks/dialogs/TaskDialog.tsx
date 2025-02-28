@@ -43,7 +43,7 @@ import { Plus } from "lucide-react";
 
 interface TaskDialogProps {
   product_id?: string;
-  taskId?: string;
+  task_id?: string;
   date?: Date;
   open: boolean;
   onClose: () => void;
@@ -51,7 +51,7 @@ interface TaskDialogProps {
 
 export default function TaskDialog({
   product_id,
-  taskId,
+  task_id,
   date,
   open,
   onClose,
@@ -66,7 +66,7 @@ export default function TaskDialog({
 
   const { formData, handleChange, mutation } = useTaskForm({
     product_id: selectedProduct as string,
-    taskId,
+    task_id,
     date,
   });
 
@@ -79,7 +79,7 @@ export default function TaskDialog({
 
   return (
     <FormDialog
-      title={taskId ? "Edit Task" : "Add Task"}
+      title={task_id ? "Edit Task" : "Add Task"}
       open={open}
       onClose={onClose}
       onConfirm={() => {
@@ -87,7 +87,7 @@ export default function TaskDialog({
         mutation.mutate();
         onClose();
       }}
-      confirmText={taskId ? "Save Changes" : "Add Task"}
+      confirmText={task_id ? "Save Changes" : "Add Task"}
     >
       {/* Product Selection Dropdown */}
       {!product_id && (

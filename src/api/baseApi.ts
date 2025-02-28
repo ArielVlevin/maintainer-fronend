@@ -1,4 +1,5 @@
-import { apiClient, ApiResponse } from "./axios";
+import { ApiResponse, BaseResponse } from "@/types/ApiResponse";
+import { apiClient } from "./axios";
 
 /**
  * פונקציה לשליפת נתונים מהשרת עם תמיכה בדפדוף
@@ -6,8 +7,22 @@ import { apiClient, ApiResponse } from "./axios";
 export async function fetchPaginatedData<T>(
   endpoint: string,
   params: Record<string, any> = {}
-): Promise<ApiResponse<T[]>> {
-  return await apiClient<T[]>(endpoint, "GET", null, { params });
+): Promise<BaseResponse<T>> {
+  try {
+    const response = await apiClient<ApiResponse<T[]>>(endpoint, "GET", null, {
+      params,
+    });
+    if (!response.success)
+      throw new Error(response.message || "❌ Failed to fetch items.");
+
+    return response.data as BaseResponse<T>;
+  } catch (error) {
+    console.error(
+      `❌ Error fetching item in ${endpoint}:`,
+      (error as Error)?.message || error
+    );
+    throw new Error((error as Error)?.message || "Failed to fetch items.");
+  }
 }
 
 /**

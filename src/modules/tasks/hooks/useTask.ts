@@ -9,16 +9,16 @@ import { useNotification } from "@/context/NotificationContext";
  * @returns {object} Query result containing task data, loading state, and error state.
  */
 export const useTasks = ({
-  taskId,
-  productId,
+  task_id,
+  product_id,
   search,
   status,
   page = 1,
   limit = 10,
   enabled = true,
 }: {
-  taskId?: string;
-  productId?: string;
+  task_id?: string;
+  product_id?: string;
   search?: string;
   status?: "pending" | "completed" | "overdue";
   page?: number;
@@ -28,12 +28,12 @@ export const useTasks = ({
   const { showError } = useNotification();
 
   return useQuery({
-    queryKey: ["tasks", taskId, productId, search, status, page, limit],
+    queryKey: ["tasks", task_id, product_id, search, status, page, limit],
     queryFn: async () => {
       try {
         return await fetchTasks({
-          taskId,
-          productId,
+          task_id,
+          product_id,
           search,
           status,
           page,
@@ -46,6 +46,6 @@ export const useTasks = ({
       }
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    enabled: enabled || !!taskId || !!productId || search !== undefined,
+    enabled: enabled || !!task_id || !!product_id || search !== undefined,
   });
 };

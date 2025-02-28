@@ -1,6 +1,12 @@
-import { api, ApiResponse } from "@/api/axios";
+import { api } from "@/api/axios";
 import { ITask } from "@/types/ITask";
-import { createItem, updateItem, deleteItem } from "@/api/baseApi";
+import {
+  createItem,
+  updateItem,
+  deleteItem,
+  fetchPaginatedData,
+} from "@/api/baseApi";
+import { ApiResponse, BaseResponse } from "@/types/ApiResponse";
 
 /**
  * Adds a new task to a specific product in the database.
@@ -22,18 +28,20 @@ export const addTask = async (
  * @returns {Promise<ITask>} A promise that resolves to the updated task.
  */
 export const updateTask = (
-  taskId: string,
+  task_id: string,
   updatedData: ITask
-): Promise<ITask> => updateItem<ITask>("/tasks", taskId, updatedData);
+): Promise<ITask> => updateItem<ITask>("/tasks", task_id, updatedData);
 
 /**
  * Deletes a task from the database.
  *
  * @param {string} taskId - The ID of the task to delete.
  */
-export const deleteTask = async (taskId: string): Promise<void> =>
-  deleteItem("/tasks", taskId);
+export const deleteTask = async (task_id: string): Promise<void> => {
+  console.log("deleting: task_id: ", task_id);
 
+  return deleteItem("/tasks", task_id);
+};
 /**
  * Fetch a paginated list of tasks.
  *
@@ -41,36 +49,24 @@ export const deleteTask = async (taskId: string): Promise<void> =>
  * @returns {Promise<ITask[]>} - List of tasks.
  */
 export const fetchTasks = async ({
-  taskId,
-  productId,
+  task_id,
+  product_id,
   search,
   status,
   page = 1,
   limit = 10,
 }: {
-  taskId?: string;
-  productId?: string;
+  task_id?: string;
+  product_id?: string;
   search?: string;
   status?: "pending" | "completed" | "overdue";
   page?: number;
   limit?: number;
-}): Promise<ITask[]> => {
-  try {
-    const { data } = await api.get<ApiResponse<ITask[]>>("/tasks", {
-      params: { taskId, productId, search, status, page, limit },
-    });
-
-    if (!data.success)
-      throw new Error(data.error || "❌ Failed to fetch tasks.");
-
-    return data.data as ITask[];
-  } catch (error) {
-    console.error(
-      "❌ Error fetching tasks:",
-      (error as Error)?.message || error
-    );
-    throw new Error((error as Error)?.message || "Failed to fetch tasks.");
-  }
+}): Promise<BaseResponse<ITask>> => {
+  const response = await fetchPaginatedData("/tasks", {
+    params: { task_id, product_id, search, status, page, limit },
+  });
+  return response as BaseResponse<ITask>;
 };
 
 /**
@@ -79,10 +75,10 @@ export const fetchTasks = async ({
  * @param {string} taskId - The ID of the task to mark as completed.
  * @returns {Promise<ITask>} - The updated task.
  */
-export const markTaskAsDone = async (taskId: string): Promise<ITask> => {
+export const markTaskAsDone = async (task_id: string): Promise<ITask> => {
   try {
     const { data } = await api.patch<ApiResponse<ITask>>(
-      `/tasks/${taskId}/complete`
+      `/tasks/${task_id}/complete`
     );
 
     if (!data.success)
@@ -101,14 +97,14 @@ export const markTaskAsDone = async (taskId: string): Promise<ITask> => {
 /**
  * Postpone a task by a given number of days.
  *
- * @param {string} taskId - The ID of the task to postpone.
+ * @param {string} task_id - The ID of the task to postpone.
  * @param {number} days - The number of days to postpone the task.
  * @returns {Promise<{ success: boolean; message: string; task?: ITask }>} - The updated task and success message.
  */
-export const postponeTask = async (taskId: string, days: number) => {
+export const postponeTask = async (task_id: string, days: number) => {
   try {
     const { data } = await api.patch<ApiResponse<ITask>>(
-      `/tasks/${taskId}/postpone`,
+      `/tasks/${task_id}/postpone`,
       { days }
     );
 

@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
  */
 
 export const useProducts = ({
-  productId,
+  product_id,
   slug,
   page = 1,
   limit = 10,
@@ -20,7 +20,7 @@ export const useProducts = ({
   userOnly = true,
   enabled = true,
 }: {
-  productId?: string;
+  product_id?: string;
   slug?: string;
   page?: number;
   limit?: number;
@@ -35,7 +35,7 @@ export const useProducts = ({
   return useQuery({
     queryKey: [
       "products",
-      productId || null,
+      product_id || null,
       slug || null,
       page,
       limit,
@@ -47,7 +47,7 @@ export const useProducts = ({
     queryFn: async () => {
       try {
         return await fetchProducts({
-          productId,
+          product_id,
           slug,
           search,
           fields,
@@ -63,6 +63,6 @@ export const useProducts = ({
       }
     },
     staleTime: 1000 * 60 * 5,
-    enabled: !!productId || enabled,
+    enabled: !!product_id || enabled,
   });
 };

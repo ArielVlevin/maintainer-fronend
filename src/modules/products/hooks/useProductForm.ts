@@ -9,10 +9,10 @@ import { useProducts } from "@/modules/products/hooks/useProduct";
 import { useProductActions } from "./useProductActions";
 
 interface UseProductFormProps {
-  productId?: string;
+  product_id?: string;
 }
 
-export function useProductForm({ productId }: UseProductFormProps) {
+export function useProductForm({ product_id }: UseProductFormProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { addMutation, updateMutation } = useProductActions();
@@ -21,6 +21,7 @@ export function useProductForm({ productId }: UseProductFormProps) {
   // ✅ Memoized Empty Product
   const emptyProduct: IProduct = useMemo(
     () => ({
+      _id: product_id,
       name: "",
       slug: "",
       category: "",
@@ -33,7 +34,7 @@ export function useProductForm({ productId }: UseProductFormProps) {
       lastOverallMaintenance: undefined,
       nextOverallMaintenance: undefined,
     }),
-    []
+    [product_id]
   );
 
   const [formData, setFormData] = useState<IProduct>(emptyProduct);
@@ -41,8 +42,8 @@ export function useProductForm({ productId }: UseProductFormProps) {
 
   // ✅ Fetch Existing Product if Editing
   const { data: product, isFetching } = useProducts({
-    productId,
-    enabled: !!productId, // Fetch only if `productId` exists
+    product_id,
+    enabled: !!product_id, // Fetch only if `productId` exists
   });
 
   // ✅ Populate form when editing
@@ -76,9 +77,9 @@ export function useProductForm({ productId }: UseProductFormProps) {
       setIsUploading(true);
       const file = imageUploadProps.fileInputRef.current?.files?.[0];
 
-      return productId
+      return product_id
         ? updateMutation.mutateAsync({
-            productId,
+            product_id,
             updatedData: formData,
             imageFile: file,
           })

@@ -1,4 +1,5 @@
-import { api, ApiResponse } from "@/api/axios";
+import { api } from "@/api/axios";
+import { ApiResponse } from "@/types/ApiResponse";
 import { IUser } from "@/types/IUser";
 
 /**

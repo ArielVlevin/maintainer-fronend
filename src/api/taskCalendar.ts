@@ -1,5 +1,6 @@
 import { CalendarEvent } from "@/types/ICalander";
-import { api, ApiResponse } from "./axios";
+import { api } from "./axios";
+import { ApiResponse } from "@/types/ApiResponse";
 
 /**
  * Fetches all maintenance tasks for a user.
@@ -29,11 +30,11 @@ export const fetchUserTasksCalendar = async (): Promise<CalendarEvent[]> => {
  * Fetches all maintenance tasks for a specific product.
  */
 export const fetchProductTasksCalendar = async (
-  productId: string
+  product_id: string
 ): Promise<CalendarEvent[]> => {
   try {
     const { data } = await api.get<ApiResponse<CalendarEvent[]>>(
-      `/calendar/product/${productId}`
+      `/calendar/product/${product_id}`
     );
 
     if (!data.success)

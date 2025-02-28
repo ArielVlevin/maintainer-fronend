@@ -7,14 +7,14 @@ import {
 /**
  * Hook for fetching calendar tasks.
  */
-export const useTaskCalendar = ({ productId }: { productId?: string }) => {
+export const useTaskCalendar = ({ product_id }: { product_id?: string }) => {
   return useQuery({
-    queryKey: productId
-      ? ["calendar", "product", productId]
+    queryKey: product_id
+      ? ["calendar", "product", product_id]
       : ["calendar", "user"],
     queryFn: () =>
-      productId
-        ? fetchProductTasksCalendar(productId)
+      product_id
+        ? fetchProductTasksCalendar(product_id)
         : fetchUserTasksCalendar(),
     staleTime: 1000 * 60 * 5,
   });

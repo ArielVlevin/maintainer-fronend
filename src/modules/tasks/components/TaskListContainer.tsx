@@ -36,7 +36,7 @@ export default function TaskListContainer({
   const { showError } = useNotification();
 
   const { data, isLoading, isError, error } = useTasks({
-    productId: product?._id,
+    product_id: product?._id,
     page,
     limit,
   });
@@ -120,7 +120,7 @@ export default function TaskListContainer({
       {selectedTask && (
         <TaskDialog
           product_id={product?._id}
-          taskId={selectedTask._id}
+          task_id={selectedTask._id}
           open={editDialogOpen}
           onClose={() => setEditDialogOpen(false)}
         />
@@ -130,8 +130,8 @@ export default function TaskListContainer({
           taskId={selectedTask._id || ""}
           open={isPostponeDialogOpen}
           onClose={() => setPostponeDialogOpen(false)}
-          onPostpone={(taskId, days) =>
-            postponeTaskMutation.mutate({ taskId, days })
+          onPostpone={(task_id, days) =>
+            postponeTaskMutation.mutate({ task_id, days })
           }
         />
       )}

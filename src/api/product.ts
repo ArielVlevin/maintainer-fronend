@@ -1,7 +1,8 @@
 import { IProduct } from "@/types/IProduct";
-import { api, ApiResponse } from "./axios";
+import { api } from "./axios";
 import { uploadImage } from "./upload";
-import { deleteItem } from "./baseApi";
+import { deleteItem, fetchPaginatedData } from "./baseApi";
+import { ApiResponse, BaseResponse } from "@/types/ApiResponse";
 
 /**
  * Fetch a paginated list of products.
@@ -10,7 +11,7 @@ import { deleteItem } from "./baseApi";
  * @returns {Promise<ApiResponse<IProduct[]>>} - List of products with pagination data.
  */
 export const fetchProducts = async ({
-  productId,
+  product_id,
   slug,
   search,
   fields,
@@ -19,7 +20,7 @@ export const fetchProducts = async ({
   limit = 10,
   userOnly = true,
 }: {
-  productId?: string;
+  product_id?: string;
   slug?: string;
   search?: string;
   fields?: string[];
@@ -27,36 +28,21 @@ export const fetchProducts = async ({
   page?: number;
   limit?: number;
   userOnly?: boolean;
-}): Promise<IProduct[]> => {
-  try {
-    const { data } = await api.get<ApiResponse<IProduct[]>>("/products", {
-      params: {
-        productId,
-        slug,
-        search,
-        fields,
-        category,
-        page,
-        limit,
-        userOnly,
-      },
-    });
-
-    if (!data.success)
-      throw new Error(data.error || "❌ Failed to fetch products.");
-
-    return data.data as IProduct[];
-  } catch (error) {
-    console.error(
-      "❌ Error fetching products:",
-      error?.response?.data || error
-    );
-    throw new Error(
-      error?.response?.data?.message || "Failed to fetch products."
-    );
-  }
+}): Promise<BaseResponse<IProduct>> => {
+  const response = await fetchPaginatedData("/products", {
+    params: {
+      product_id,
+      slug,
+      search,
+      fields,
+      category,
+      page,
+      limit,
+      userOnly,
+    },
+  });
+  return response as BaseResponse<IProduct>;
 };
-
 /**
  * Adds a new product to the database.
  *
@@ -106,7 +92,7 @@ export const addProduct = async (
  * @throws {Error} If the request fails.
  */
 export const updateProduct = async (
-  productId: string,
+  product_id: string,
   updatedProduct: IProduct,
   imageFile?: File
 ): Promise<IProduct> => {
@@ -123,7 +109,7 @@ export const updateProduct = async (
 
     // ✅ Send updated product data to backend
     const { data } = await api.put<ApiResponse<IProduct>>(
-      `/products/${productId}`,
+      `/products/${product_id}`,
       productData
     );
 
@@ -142,11 +128,11 @@ export const updateProduct = async (
 /**
  * Delete a product.
  *
- * @param {string} productId - The ID of the product to delete.
+ * @param {string} product_id - The ID of the product to delete.
  */
-export const deleteProduct = async (productId: string): Promise<void> => {
+export const deleteProduct = async (product_id: string): Promise<void> => {
   try {
-    await deleteItem("/products", productId);
+    await deleteItem("/products", product_id);
     console.log("✅ Product deleted successfully.");
   } catch (error: any) {
     console.error("❌ Error deleting product:", error?.response?.data || error);

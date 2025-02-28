@@ -18,7 +18,7 @@ export const useTaskActions = () => {
 
   // ✅ Delete Task
   const deleteMutation = useMutation({
-    mutationFn: async (taskId: string) => deleteTask(taskId),
+    mutationFn: async (task_id: string) => deleteTask(task_id),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -32,12 +32,12 @@ export const useTaskActions = () => {
   // ✅ Update Task
   const updateMutation = useMutation({
     mutationFn: async ({
-      taskId,
+      task_id,
       updatedData,
     }: {
-      taskId: string;
+      task_id: string;
       updatedData: ITask;
-    }) => updateTask(taskId, updatedData),
+    }) => updateTask(task_id, updatedData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -67,7 +67,7 @@ export const useTaskActions = () => {
   });
 
   const completeTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => markTaskAsDone(taskId),
+    mutationFn: async (task_id: string) => markTaskAsDone(task_id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       showSuccess("Task completed successfully! ✅");
@@ -86,8 +86,8 @@ export const useTaskActions = () => {
    * postponeTaskMutation.mutate({ taskId: "task123", days: 3 });
    */
   const postponeTaskMutation = useMutation({
-    mutationFn: async ({ taskId, days }: { taskId: string; days: number }) =>
-      postponeTask(taskId, days),
+    mutationFn: async ({ task_id, days }: { task_id: string; days: number }) =>
+      postponeTask(task_id, days),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });

@@ -11,3 +11,15 @@ export interface BaseResponse<T> {
   totalPages: number; // ✅ Total number of pages
   message?: string; // ✅ Optional message (for errors or additional info)
 }
+
+/**
+ * Generic base interface for API responses.
+ *
+ * @template T - Type of data being returned.
+ */
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T | BaseResponse<T> | null;
+  error?: string;
+}

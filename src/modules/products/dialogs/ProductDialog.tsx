@@ -20,24 +20,24 @@ import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 
 interface ProductDialogProps {
-  productId?: string;
+  product_id?: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function ProductDialog({
-  productId,
+  product_id,
   open,
   onClose,
 }: ProductDialogProps) {
   const { formData, handleChange, mutation, isSubmitting, imageUploadProps } =
     useProductForm({
-      productId,
+      product_id,
     });
 
   return (
     <FormDialog
-      title={productId ? "Edit Product" : "Add Product"}
+      title={product_id ? "Edit Product" : "Add Product"}
       open={open}
       onClose={onClose}
       onConfirm={() => {
@@ -47,7 +47,7 @@ export default function ProductDialog({
       confirmText={
         isSubmitting
           ? "Processing..."
-          : productId
+          : product_id
           ? "Save Changes"
           : "Add Product"
       }

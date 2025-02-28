@@ -63,7 +63,7 @@ export default function ProductListContainer() {
 
       {selectedProduct && (
         <ProductDialog
-          productId={selectedProduct._id}
+          product_id={selectedProduct._id}
           open={editDialogOpen}
           onClose={() => setEditDialogOpen(false)}
         />

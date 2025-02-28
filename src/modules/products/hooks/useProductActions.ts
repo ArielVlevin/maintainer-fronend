@@ -12,7 +12,7 @@ export const useProductActions = () => {
 
   // ✅ Delete Product
   const deleteMutation = useMutation({
-    mutationFn: (productId: string) => deleteProduct(productId),
+    mutationFn: (product_id: string) => deleteProduct(product_id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       showSuccess("Product deleted successfully! 🗑️");
@@ -25,14 +25,14 @@ export const useProductActions = () => {
   // ✅ Update Product
   const updateMutation = useMutation({
     mutationFn: async ({
-      productId,
+      product_id,
       updatedData,
       imageFile,
     }: {
-      productId: string;
+      product_id: string;
       updatedData: IProduct;
       imageFile?: File;
-    }) => updateProduct(productId, updatedData, imageFile), // 🛠️ שימוש בפונקציה מה-API
+    }) => updateProduct(product_id, updatedData, imageFile),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
