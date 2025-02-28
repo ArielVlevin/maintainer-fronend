@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { getSession, signOut } from "next-auth/react";
 
 /**
@@ -75,3 +75,43 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T | null;
+  error?: string;
+}
+
+export const apiClient = async <T>(
+  endpoint: string,
+  method: "GET" | "POST" | "PUT" | "DELETE",
+  body?: any,
+  config: AxiosRequestConfig = {}
+): Promise<ApiResponse<T>> => {
+  try {
+    const response = await api({
+      url: endpoint,
+      method,
+      data: body,
+      ...config,
+    });
+
+    return response.data as ApiResponse<T>;
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiResponse<null>>;
+
+    if (axiosError.response)
+      return {
+        success: false,
+        message: axiosError.response.data.message || "Unknown error",
+        data: null, // 👈 החזר null עם טיפוס T
+      };
+
+    return {
+      success: false,
+      message: "Server unavailable. Please try again later.",
+      data: null,
+    };
+  }
+};

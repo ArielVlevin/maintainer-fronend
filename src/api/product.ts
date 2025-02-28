@@ -1,13 +1,13 @@
-import { BaseResponse } from "@/types/ApiResponse";
-import { deleteItem } from "./baseApi";
 import { IProduct } from "@/types/IProduct";
-import { api } from "./axios";
+import { api, ApiResponse } from "./axios";
 import { uploadImage } from "./upload";
+import { deleteItem } from "./baseApi";
+
 /**
  * Fetch a paginated list of products.
  *
  * @param {object} params - Query parameters for filtering products.
- * @returns {Promise<BaseResponse<IProduct>>} - List of products with pagination data.
+ * @returns {Promise<ApiResponse<IProduct[]>>} - List of products with pagination data.
  */
 export const fetchProducts = async ({
   productId,
@@ -27,9 +27,9 @@ export const fetchProducts = async ({
   page?: number;
   limit?: number;
   userOnly?: boolean;
-}): Promise<BaseResponse<IProduct>> => {
+}): Promise<IProduct[]> => {
   try {
-    const response = await api.get<BaseResponse<IProduct>>("/products", {
+    const { data } = await api.get<ApiResponse<IProduct[]>>("/products", {
       params: {
         productId,
         slug,
@@ -42,10 +42,18 @@ export const fetchProducts = async ({
       },
     });
 
-    return response.data;
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to fetch products.");
+
+    return data.data as IProduct[];
   } catch (error) {
-    console.error("❌ Error fetching products:", error);
-    throw new Error("Failed to fetch products.");
+    console.error(
+      "❌ Error fetching products:",
+      error?.response?.data || error
+    );
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch products."
+    );
   }
 };
 
@@ -62,7 +70,7 @@ export const addProduct = async (
   imageFile?: File
 ): Promise<IProduct> => {
   try {
-    let iconUrl;
+    let iconUrl = product.iconUrl;
 
     // ✅ Upload image if provided
     if (imageFile) {
@@ -70,14 +78,21 @@ export const addProduct = async (
       if (uploadedImageUrl) iconUrl = uploadedImageUrl;
     }
 
-    const newProduct = { ...product, iconUrl };
+    const productData = { ...product, iconUrl };
 
     // ✅ Send product data to backend
-    const { data } = await api.post<IProduct>("/products", newProduct);
-    return data;
-  } catch (error) {
-    console.error("❌ Error adding product:", error);
-    throw new Error("Failed to add product.");
+    const { data } = await api.post<ApiResponse<IProduct>>(
+      "/products",
+      productData
+    );
+
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to add product.");
+
+    return data.data as IProduct;
+  } catch (error: any) {
+    console.error("❌ Error adding product:", error?.response?.data || error);
+    throw new Error(error?.response?.data?.message || "Failed to add product.");
   }
 };
 
@@ -107,20 +122,36 @@ export const updateProduct = async (
     const productData = { ...updatedProduct, iconUrl };
 
     // ✅ Send updated product data to backend
-    const { data } = await api.put<IProduct>(
+    const { data } = await api.put<ApiResponse<IProduct>>(
       `/products/${productId}`,
       productData
     );
-    return data;
-  } catch (error) {
-    console.error("❌ Error updating product:", error);
-    throw new Error("Failed to update product.");
+
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to update product.");
+
+    return data.data as IProduct;
+  } catch (error: any) {
+    console.error("❌ Error updating product:", error?.response?.data || error);
+    throw new Error(
+      error?.response?.data?.message || "Failed to update product."
+    );
   }
 };
+
 /**
  * Delete a product.
  *
  * @param {string} productId - The ID of the product to delete.
  */
-export const deleteProduct = (productId: string) =>
-  deleteItem("/products", productId);
+export const deleteProduct = async (productId: string): Promise<void> => {
+  try {
+    await deleteItem("/products", productId);
+    console.log("✅ Product deleted successfully.");
+  } catch (error: any) {
+    console.error("❌ Error deleting product:", error?.response?.data || error);
+    throw new Error(
+      error?.response?.data?.message || "Failed to delete product."
+    );
+  }
+};

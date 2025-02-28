@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Apple, Facebook } from "lucide-react";
+import { Facebook } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -73,16 +73,6 @@ export default function SignInPage() {
                   Sign in with Google
                 </>
               )}
-            </Button>
-
-            {/* Apple Sign-In */}
-            <Button
-              className="w-full flex items-center justify-center gap-2 bg-black text-white hover:bg-gray-800"
-              onClick={() => handleSignIn("apple")}
-              disabled={isLoading}
-            >
-              <Apple className="w-5 h-5" />
-              Sign in with Apple
             </Button>
 
             {/* Facebook Sign-In */}

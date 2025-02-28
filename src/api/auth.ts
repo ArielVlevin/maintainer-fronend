@@ -1,4 +1,4 @@
-import { api } from "@/api/axios";
+import { api, ApiResponse } from "@/api/axios";
 import { IUser } from "@/types/IUser";
 
 /**
@@ -21,20 +21,26 @@ export const verifyUser = async ({
   if (!name || !email) throw new Error("❌ User data is missing.");
 
   try {
-    const response = await api.post("/auth/verify-user", {
+    // שליחת הבקשה עם טיפוס נתונים מדויק
+    const { data } = await api.post<ApiResponse<IUser>>("/auth/verify-user", {
       name,
       email,
     });
 
-    console.log("✅ Backend response:", response.data);
+    console.log("✅ Backend response:", data);
 
-    if (!response.data || !response.data.user)
-      throw new Error("❌ Invalid response from backend.");
+    // בדיקה אם הבקשה נכשלה
+    if (!data.success || !data.data) {
+      throw new Error(data.error || "❌ Invalid response from backend.");
+    }
 
-    return response.data.user;
-  } catch (error) {
-    console.error("❌ Error verifying user in backend: ", error);
-    throw new Error("Failed to verify user.");
+    return data.data;
+  } catch (error: any) {
+    console.error(
+      "❌ Error verifying user in backend:",
+      error?.response?.data || error
+    );
+    throw new Error(error?.response?.data?.message || "Failed to verify user.");
   }
 };
 
@@ -55,51 +61,94 @@ export const updateUser = async ({
   email: string;
 }): Promise<void> => {
   try {
-    const response = await api.post("/auth/update-user", {
+    const { data } = await api.post<ApiResponse<null>>("/auth/update-user", {
       name,
       email,
     });
 
-    if (!response.data.success)
-      throw new Error(response.data.message || "Failed to update user");
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to update user.");
 
     console.log("✅ User profile updated successfully");
-  } catch (error) {
-    console.error("❌ Error updating user profile:", error);
-    throw new Error("Failed to update user.");
+  } catch (error: any) {
+    console.error(
+      "❌ Error updating user profile:",
+      error?.response?.data || error
+    );
+    throw new Error(error?.response?.data?.message || "Failed to update user.");
   }
 };
 
+/**
+ * Fetches a user by their ID from the backend.
+ *
+ * @param {string} _id - The user's ID.
+ * @returns {Promise<IUser | null>} - The user object or null if not found.
+ * @throws {Error} If the request fails.
+ */
 export const fetchUserById = async (_id: string): Promise<IUser | null> => {
   try {
-    const response = await api.get<IUser>(`/auth/${_id}`);
-    return response.data;
-  } catch (error) {
-    console.error("❌ Failed to fetch user:", error);
-    throw new Error("Failed to fetch user.");
+    const { data } = await api.get<ApiResponse<IUser>>(`/auth/${_id}`);
+
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to fetch user.");
+
+    return data.data;
+  } catch (error: any) {
+    console.error("❌ Failed to fetch user:", error?.response?.data || error);
+    throw new Error(error?.response?.data?.message || "Failed to fetch user.");
   }
 };
 
-export async function sendVerificationEmail() {
+/**
+ * Sends a verification email to the user.
+ *
+ * @returns {Promise<void>} - Resolves when the email is sent.
+ * @throws {Error} If the request fails.
+ */
+export async function sendVerificationEmail(): Promise<void> {
   try {
-    const response = await api.post("/auth/send-verification-email");
-    return response.data;
-  } catch (error) {
-    console.error("❌ Failed to send verification Email:", error);
-    throw new Error("Failed to send verification Email.");
+    const { data } = await api.post<ApiResponse<null>>(
+      "/auth/send-verification-email"
+    );
+
+    if (!data.success)
+      throw new Error(data.error || "❌ Failed to send verification email.");
+  } catch (error: any) {
+    console.error(
+      "❌ Failed to send verification Email:",
+      error?.response?.data || error
+    );
+    throw new Error(
+      error?.response?.data?.message || "Failed to send verification email."
+    );
   }
 }
 
-export async function verifyEmail(token: string) {
+/**
+ * Verifies a user's email using a token.
+ *
+ * @param {string} token - The verification token.
+ * @returns {Promise<{ success: boolean, message: string }>} - Verification result.
+ * @throws {Error} If the request fails.
+ */
+export async function verifyEmail(
+  token: string
+): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await api.post("/auth/verify-email", { token });
-    if (!response.data.success) {
-      console.log("⚠️ Verification failed:", response.data.message);
-      return { success: false, message: response.data.message };
+    const { data } = await api.post<ApiResponse<null>>("/auth/verify-email", {
+      token,
+    });
+
+    if (!data.success) {
+      console.warn("⚠️ Verification failed:", data.error);
+      return { success: false, message: data.error || "Verification failed." };
     }
-    return response.data;
+    return { success: true, message: "Email verified successfully." };
   } catch (error) {
-    console.error("❌ Failed to verify Email:", error);
-    throw new Error("Failed to verify Email.");
+    console.error("❌ Failed to verify email:", error?.response?.data || error);
+    throw new Error(
+      error?.response?.data?.message || "Failed to verify email."
+    );
   }
 }
