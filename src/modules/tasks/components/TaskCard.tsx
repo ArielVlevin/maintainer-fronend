@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ITask } from "@/types/ITask";
-import AlertComponent from "@/components/common/AlertDialog";
+import AlertComponent from "@/components/dialog/AlertDialog";
 import { useState } from "react";
-import TaskDialog from "../dialogs/TaskDialog";
+import TaskDialog from "../dialogs/___TaskDialog";
 import { CardDropdownMenu } from "@/components/common/CardDropDownMenu";
 
 interface TaskCardProps {
@@ -73,7 +73,7 @@ export function TaskCard({ task, onTakeCare, onDelete }: TaskCardProps) {
       </Card>
       <TaskDialog
         product_id={task.product_id}
-        taskId={task._id}
+        task_id={task._id}
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />

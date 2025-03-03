@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ConfirmDeleteDialog from "@/components/common/ConfirmDeleteDialog";
+import ConfirmDeleteDialog from "@/components/dialog/ConfirmDeleteDialog";
 import { useState } from "react";
 import ProductDialog from "@/components/products/ProductDialog";
 

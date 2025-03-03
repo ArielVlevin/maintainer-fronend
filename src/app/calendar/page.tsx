@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/modules/auth/AuthGuard";
 import { TaskCalendar } from "@/modules/calendar/components/TaskCalendar";
 
 export default function CalendarPage() {

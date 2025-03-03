@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Label } from "../ui/label";
 
 /**
- * @interface FormFieldProps
+ * @interface InputFieldProps
  * @description Props for the `FormField` component.
  * @property {string} label - The label text for the input field.
  * @property {string} [type="text"] - The type of the input field (default is "text").
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * @property {(e: React.ChangeEvent<HTMLInputElement>) => void} onChange - Function to handle input changes.
  * @property {boolean} [required=true] - Whether the field is required (default is true).
  */
-interface FormFieldProps {
+interface DateInputFieldProps {
   label: string;
   type?: string;
   name: string;
@@ -25,7 +25,7 @@ interface FormFieldProps {
 }
 
 /**
- * @component FormField
+ * @component InputField
  * @description A reusable input field with a label for forms.
  *
  * @param {FormFieldProps} props - The properties of the component.
@@ -33,7 +33,7 @@ interface FormFieldProps {
  *
  * @example
  * // Example usage for a text input
- * <FormField
+ * <InputField
  *   label="Username"
  *   name="username"
  *   value={username}
@@ -42,7 +42,7 @@ interface FormFieldProps {
  *
  * @example
  * // Example usage for a number input
- * <FormField
+ * <InputField
  *   label="Age"
  *   name="age"
  *   type="number"
@@ -50,7 +50,7 @@ interface FormFieldProps {
  *   onChange={(e) => setAge(Number(e.target.value))}
  * />
  */
-export default function FormField({
+export default function DateInputField({
   label,
   type = "text",
   name,
@@ -59,10 +59,13 @@ export default function FormField({
   onChange,
   required = true,
   className,
-}: FormFieldProps) {
+}: DateInputFieldProps) {
   return (
-    <div className={cn(className, "flex flex-col gap-1 mb-4")}>
-      <Label htmlFor={name} className="block font-medium mb-1">
+    <div className="group relative">
+      <Label
+        htmlFor={name}
+        className="bg-background text-foreground absolute start-1 top-0 z-10 block -translate-y-1/2 px-2 text-xs font-medium group-has-disabled:opacity-50"
+      >
         {label}
       </Label>
       <Input
@@ -73,6 +76,7 @@ export default function FormField({
         value={String(value)}
         onChange={onChange}
         required={required}
+        className={cn("h-10", className)}
       />
     </div>
   );

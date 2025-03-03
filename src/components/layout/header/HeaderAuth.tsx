@@ -2,7 +2,7 @@ import {
   DashBoardButton,
   LogoutButton,
   SignInButton,
-} from "@/components/auth/AuthButton";
+} from "@/modules/auth/AuthButton";
 import { Button } from "@/components/ui/button";
 import { isProtectedPage } from "@/config/navLinks";
 

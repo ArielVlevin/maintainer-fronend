@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { IProduct } from "@/types/IProduct";
-import { useImageUpload } from "@/hooks/use-image-upload";
-import { useProducts } from "@/modules/products/hooks/useProduct";
 import { useProductActions } from "./useProductActions";
+import { useProducts } from "@/modules/products/hooks/useProduct";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formSchema, ProductFormData } from "../schema/productFormSchema";
+import { useImageUpload } from "@/hooks/use-image-upload";
 
 interface UseProductFormProps {
   product_id?: string;
@@ -18,98 +20,69 @@ export function useProductForm({ product_id }: UseProductFormProps) {
   const { addMutation, updateMutation } = useProductActions();
   const imageUploadProps = useImageUpload();
 
-  // ✅ Memoized Empty Product
-  const emptyProduct: IProduct = useMemo(
+  // ברירות מחדל למוצר חדש
+  const defaultValues: ProductFormData = useMemo(
     () => ({
-      _id: product_id,
+      product_id: product_id || "",
       name: "",
-      slug: "",
       category: "",
       manufacturer: "",
-      user_id: "",
       model: "",
       tags: [],
       purchaseDate: new Date(),
-      tasks: [],
       lastOverallMaintenance: undefined,
       nextOverallMaintenance: undefined,
     }),
     [product_id]
   );
 
-  const [formData, setFormData] = useState<IProduct>(emptyProduct);
-  const [isUploading, setIsUploading] = useState(false);
-
-  // ✅ Fetch Existing Product if Editing
-  const { data: product, isFetching } = useProducts({
-    product_id,
-    enabled: !!product_id, // Fetch only if `productId` exists
+  const form = useForm<ProductFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
   });
 
-  // ✅ Populate form when editing
+  // אם עורך מוצר קיים - טען את הנתונים מהשרת
+  const { data, isFetching } = useProducts({
+    product_id,
+    enabled: !!product_id,
+  });
+
   useEffect(() => {
-    if (product?.items[0]) {
-      setFormData((prev) => ({
-        ...prev,
-        ...product.items[0],
-        tags: Array.isArray(product.items[0].tags) ? product.items[0].tags : [],
-      }));
+    if (product_id && data?.items[0]) {
+      form.reset(data.items[0]);
     }
-  }, [product]);
+  }, [product_id, data, form]);
 
-  // ✅ Handle Input Changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // ✅ Handle Tags Change (string -> array)
-  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: e.target.value.split(",").map((tag) => tag.trim()),
-    }));
-  };
-
-  // ✅ Determine if creating or updating
+  // שליחת נתוני המוצר לשרת
   const mutation = useMutation({
-    mutationFn: async () => {
-      setIsUploading(true);
+    mutationFn: async (values: ProductFormData) => {
       const file = imageUploadProps.fileInputRef.current?.files?.[0];
 
       return product_id
         ? updateMutation.mutateAsync({
             product_id,
-            updatedData: formData,
+            updatedData: values,
             imageFile: file,
           })
         : addMutation.mutateAsync({
-            newProductData: formData,
+            newProductData: values,
             imageFile: file,
           });
     },
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      setFormData(emptyProduct); // Reset form after success
-      setIsUploading(false);
+      form.reset(defaultValues);
       router.push("/products");
     },
-
     onError: (error) => {
       console.error("❌ Error processing product:", error);
     },
   });
 
   return {
-    formData,
-    setFormData,
+    form,
     mutation,
     isFetching,
-    isUploading,
-    handleChange,
-    handleTagsChange,
     imageUploadProps,
-    isSubmitting: addMutation.isPending || updateMutation.isPending,
   };
 }

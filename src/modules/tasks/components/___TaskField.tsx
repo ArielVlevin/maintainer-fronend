@@ -1,4 +1,4 @@
-import FormField from "@/components/app-ui/FormField";
+import InputField from "@/components/input/___InputField";
 /**
  * `TaskFields` Component
  *
@@ -46,9 +46,9 @@ interface TaskFieldsProps {
 
 const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
   return (
-    <>
+    <div className="space-y-4">
       {/* Task Name Field */}
-      <FormField
+      <InputField
         label="Task Name"
         type="text"
         name="taskName"
@@ -59,7 +59,7 @@ const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
       />
 
       {/* Task Description Field */}
-      <FormField
+      <InputField
         label="Description"
         type="text"
         name="description"
@@ -68,7 +68,7 @@ const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
         onChange={handleChange}
       />
 
-      <FormField
+      <InputField
         label="Last Maintenance Date"
         type="date"
         name="lastMaintenance"
@@ -82,7 +82,7 @@ const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
       />
 
       {/* Maintenance Frequency Field */}
-      <FormField
+      <InputField
         label="Frequency (Days)"
         type="number"
         name="frequency"
@@ -90,7 +90,7 @@ const TaskFields: React.FC<TaskFieldsProps> = ({ formData, handleChange }) => {
         onChange={handleChange}
         required
       />
-    </>
+    </div>
   );
 };
 

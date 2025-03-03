@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/modules/auth/AuthGuard";
 import { Badge } from "@/components/ui/badge";
 import ProductListContainer from "@/modules/products/components/ProductListContainer";
 export default function ProductsPage() {

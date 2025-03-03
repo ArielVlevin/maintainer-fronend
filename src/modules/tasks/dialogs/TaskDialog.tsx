@@ -1,45 +1,10 @@
-/**
- * TaskDialog Component
- *
- * This component renders a dialog for adding or editing a maintenance task.
- * It integrates with the useTaskForm hook to manage form state and handle task mutations.
- *
- * @component
- *
- * @param {string} product_id - The ID of the product to which the task belongs.
- * @param {string} [taskId] - (Optional) The ID of the task to edit; if undefined, a new task will be created.
- * @param {boolean} open - Controls whether the dialog is open.
- * @param {Function} onClose - Function to handle closing the dialog.
- *
- * @returns {JSX.Element} The rendered task dialog.
- *
- * @dependencies
- * - useTaskForm foֿֿr managing task form state and submitting changes.
- * - FormDialog for the modal UI.
- * - TaskFields for task input fields.
- *
- * @example
- * tsx
- * <TaskDialog product_id="123" open={true} onClose={() => setOpen(false)} />
- *
- */
-
-"use client";
-
-import { IProduct } from "@/types/IProduct";
-
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/authContext";
-import { useTaskForm } from "@/modules/tasks/hooks/useTaskForm";
+import { FormProvider, useWatch } from "react-hook-form";
+import FormDialog from "@/components/dialog/FormDialog";
+import TaskFields from "../components/TaskFields";
+import FormSelect from "@/components/input/FormSelect";
 import { useProducts } from "@/modules/products/hooks/useProduct";
-
-import TaskFields from "@/modules/tasks/components/TaskField";
-import FormDialog from "@/components/common/FormDialog";
-import FormSelect from "@/components/app-ui/FormSelect";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-import { Plus } from "lucide-react";
+import { useTaskForm } from "../hooks/useTaskForm";
+import { useEffect } from "react";
 
 interface TaskDialogProps {
   product_id?: string;
@@ -56,91 +21,121 @@ export default function TaskDialog({
   open,
   onClose,
 }: TaskDialogProps) {
-  const { user } = useAuth();
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<
-    string | number | undefined
-  >(product_id ? product_id : undefined);
-
   const { data, isLoading } = useProducts({});
 
-  const { formData, handleChange, mutation } = useTaskForm({
-    product_id: selectedProduct as string,
+  const { form, mutation, isFetching } = useTaskForm({
+    product_id,
     task_id,
     date,
   });
 
+  const selectedProduct_id = useWatch({
+    control: form.control,
+    name: "product_id",
+  });
+
   useEffect(() => {
-    if (open && user?._id && !isLoading) {
-      const productsData = data?.items;
-      setProducts(productsData || []);
+    if (product_id && !form.getValues("product_id")) {
+      form.setValue("product_id", product_id);
     }
-  }, [isLoading, open, data, user]);
+  }, [product_id, form]);
 
   return (
-    <FormDialog
-      title={task_id ? "Edit Task" : "Add Task"}
-      open={open}
-      onClose={onClose}
-      onConfirm={() => {
-        if (!selectedProduct) return;
-        mutation.mutate();
-        onClose();
-      }}
-      confirmText={task_id ? "Save Changes" : "Add Task"}
-    >
-      {/* Product Selection Dropdown */}
-      {!product_id && (
-        <>
+    <FormProvider {...form}>
+      <FormDialog
+        title={task_id ? "Edit Task" : "Add Task"}
+        open={open}
+        onClose={onClose}
+        onConfirm={form.handleSubmit((values) => {
+          mutation.mutate(values, {
+            onSuccess: () => onClose(),
+          });
+        })}
+        confirmText={task_id ? "Save Changes" : "Add Task"}
+        disabled={isFetching}
+      >
+        {/* ✅ Select Product Dropdown */}
+        {!product_id && (
           <FormSelect
             label="Select Product"
-            name="product"
-            value={selectedProduct as string}
-            onChange={(value) => setSelectedProduct(value)}
-            disabled={!user?._id || isLoading}
-            options={products.map((product) => ({
-              label: product.name,
-              value: product._id ? String(product._id) : "",
-            }))}
+            name="product_id"
+            value={selectedProduct_id}
+            onChange={(value) => form.setValue("product_id", value as string)}
+            disabled={isLoading}
+            options={
+              data?.items?.map((product) => ({
+                label: product.name,
+                value: product._id ? String(product._id) : "",
+              })) || []
+            }
           />
-        </>
-      )}
-
-      {/* Task Fields */}
-      {selectedProduct && (
-        <TaskFields formData={formData} handleChange={handleChange} />
-      )}
-    </FormDialog>
+        )}
+        {selectedProduct_id && <TaskFields />}
+      </FormDialog>
+    </FormProvider>
   );
 }
 
-interface AddTaskButtonProps {
-  productId?: string;
-  className?: string;
-  date?: Date;
-}
+/*
 
-export function AddTaskButton({
-  productId,
+export default function TaskDialog({
+  product_id,
+  task_id,
   date,
-  className = "flex items-center",
-}: AddTaskButtonProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  open,
+  onClose,
+}: TaskDialogProps) {
+  const { data, isLoading } = useProducts({});
+
+  const form = useForm<TaskFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      product_id: product_id || "",
+      task_id: task_id || "",
+      taskName: "",
+      description: "",
+      isRecurring: false,
+      recurringType: "lastMaintenance",
+      status: "healthy",
+      maintenanceWindowDates: {
+        startDate: date ? date : undefined,
+        endDate: undefined,
+      },
+    },
+  });
+
+  const onSubmit = async (values: TaskFormData) => {
+    console.log("Submitting task:", values);
+    onClose();
+  };
 
   return (
-    <>
-      <Button className={cn(className)} onClick={() => setIsDialogOpen(true)}>
-        <Plus className="h-4 w-4 mr-2" />
-        New Task
-      </Button>
-
-      {/* ✅ Task Dialog for Adding a New Task */}
-      <TaskDialog
-        product_id={productId}
-        date={date}
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-      />
-    </>
-  );
+    <FormProvider {...form}>
+      <FormDialog
+        title={task_id ? "Edit Task" : "Add Task"}
+        open={open}
+        onClose={onClose}
+        onConfirm={form.handleSubmit(onSubmit)}
+        confirmText={task_id ? "Save Changes" : "Add Task"}
+      >
+        {!product_id && (
+         <FormSelect
+           label="Select Product"
+           name="product_id"
+           value={form.watch("product_id")}
+           onChange={(value) => form.setValue("product_id", value as string)}
+           disabled={isLoading}
+           options={
+             data?.items?.map((product) => ({
+               label: product.name,
+               value: product._id ? String(product._id) : "",
+             })) || []
+           }
+         />
+       )}
+       <TaskFields />
+     </FormDialog>
+   </FormProvider>
+ );
 }
+*/

@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { InputWrapper } from "./InputWrapper";
 
 /**
  * @interface FormSelectProps
@@ -65,26 +65,25 @@ export default function FormSelect({
 }: FormSelectProps) {
   return (
     <div className={cn(className, "flex flex-col gap-1 mb-4")}>
-      <Label htmlFor={name} className="block font-medium">
-        {label}
-      </Label>
-      <Select
-        value={String(value)}
-        onValueChange={onChange}
-        required={required}
-        disabled={disabled}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={String(option.value)}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <InputWrapper label={label} name={name}>
+        <Select
+          value={String(value)}
+          onValueChange={onChange}
+          required={required}
+          disabled={disabled}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={String(option.value)}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </InputWrapper>
     </div>
   );
 }

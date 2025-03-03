@@ -67,7 +67,7 @@ export default function FormDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-left text-2xl">{title}</DialogTitle>
         </DialogHeader>
 
         {/* Form content */}

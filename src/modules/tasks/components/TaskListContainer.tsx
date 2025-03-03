@@ -6,12 +6,13 @@ import TaskListSkeleton from "../styles/TaskListSkeleton";
 import { useTasks } from "@/modules/tasks/hooks/useTask";
 import { NoTasksMessage } from "./NoTasksMessage";
 import { ITask } from "@/types/ITask";
-import ConfirmDeleteDialog from "@/components/common/ConfirmDeleteDialog";
+import ConfirmDeleteDialog from "@/components/dialog/ConfirmDeleteDialog";
 import { useTaskActions } from "@/modules/tasks/hooks/useTaskActions";
 import { PostponeTaskDialog } from "../dialogs/PostponeTaskDialog";
 import { IProduct } from "@/types/IProduct";
-import TaskDialog, { AddTaskButton } from "../dialogs/TaskDialog";
 import { useNotification } from "@/context/NotificationContext";
+import { AddTaskButton } from "../dialogs/AddTaskButton";
+import TaskDialog from "../dialogs/TaskDialog";
 
 /**
  * @component TaskListContainer

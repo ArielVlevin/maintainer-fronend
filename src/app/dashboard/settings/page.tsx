@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/modules/auth/AuthGuard";
 import { AccountSettings } from "@/modules/settings/AccountSettings";
 import { SettingsSidebar } from "@/modules/settings/SettingsSidebar";
 import { SecuritySettings } from "@/modules/settings/SecuritySettings";

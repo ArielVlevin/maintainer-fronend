@@ -37,11 +37,9 @@ export const updateTask = (
  *
  * @param {string} taskId - The ID of the task to delete.
  */
-export const deleteTask = async (task_id: string): Promise<void> => {
-  console.log("deleting: task_id: ", task_id);
+export const deleteTask = async (task_id: string): Promise<void> =>
+  deleteItem("/tasks", task_id);
 
-  return deleteItem("/tasks", task_id);
-};
 /**
  * Fetch a paginated list of tasks.
  *

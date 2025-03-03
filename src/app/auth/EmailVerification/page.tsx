@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { LogoutButton } from "@/components/auth/AuthButton";
-import FullScreenLoader from "@/components/app-ui/FullScreenLoading";
+import { LogoutButton } from "@/modules/auth/AuthButton";
+import FullScreenLoader from "@/components/common/FullScreenLoading";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 

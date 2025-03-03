@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/context/authContext";
-import FullScreenLoader from "../app-ui/FullScreenLoading";
+import FullScreenLoader from "@/components/common/FullScreenLoading";
 
 /**
  * @component AuthGuard

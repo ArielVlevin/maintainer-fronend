@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useTaskActions } from "@/modules/tasks/hooks/useTaskActions";
+import { ITask } from "@/types/ITask";
 import { useTasks } from "./useTask";
 import { useProducts } from "../../products/hooks/useProduct";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { formSchema } from "../schema/taskFormSchema";
-import { ITask } from "@/types/ITask";
 
 interface UseTaskFormProps {
-  product_id?: string;
+  product_id: string;
   task_id?: string;
   date?: Date;
 }
@@ -31,57 +28,50 @@ export function useTaskForm({ product_id, task_id, date }: UseTaskFormProps) {
     data: product,
     isLoading: productIsLoading,
     error: productError,
-  } = useProducts({ product_id });
+  } = useProducts({ product_id: product_id });
 
-  const defaultValues: ITask = useMemo(
+  const emptyTask: ITask = useMemo(
     () => ({
-      product_id: product_id || "",
+      product_id,
       user_id: "",
       taskName: "",
       description: "",
-      isRecurring: false,
-      recurringType: "lastMaintenance",
-      status: "healthy",
+      lastMaintenance: date || new Date(),
       frequency: 30,
-      maintenanceWindowDates: {
-        startDate: date || new Date(),
-        endDate: new Date(),
-      },
+      nextMaintenance: new Date(),
+      status: "pending",
     }),
     [product_id, date]
   );
 
-  const form = useForm<ITask>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-  });
+  const [formData, setFormData] = useState<ITask>(emptyTask);
 
   useEffect(() => {
-    form.setValue("product_id", product_id || "");
-  }, [product_id, form]);
+    if (!task_id) setFormData(emptyTask);
+    else if (data?.items[0]) setFormData(data.items[0]);
+  }, [task_id, data, emptyTask]);
 
-  useEffect(() => {
-    if (task_id && data?.items[0]) form.reset(data.items[0]);
-  }, [task_id, data, form]);
+  //  Handle Input Changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
+  // Form Submit (Create or Update)
   const mutation = useMutation({
-    mutationFn: async (values: ITask) => {
+    mutationFn: async () => {
       return task_id
-        ? updateMutation.mutateAsync({ task_id, updatedData: values })
-        : addMutation.mutateAsync({
-            product_id: values.product_id,
-            newTaskData: values,
-          });
+        ? updateMutation.mutateAsync({ task_id, updatedData: formData })
+        : addMutation.mutateAsync({ product_id, newTaskData: formData });
     },
     onSuccess: () => {
-      form.reset(defaultValues);
+      setFormData(emptyTask);
       if (
         currectPage &&
         currectPage !== product?.items[0].slug &&
         !productError
-      ) {
+      )
         router.push(`/product/${product?.items[0].slug}`);
-      }
     },
     onError: (error) => {
       console.error("❌ Error processing task:", error);
@@ -89,9 +79,10 @@ export function useTaskForm({ product_id, task_id, date }: UseTaskFormProps) {
   });
 
   return {
-    form,
-
+    formData,
+    setFormData,
     mutation,
-    isFetching: taskIsLoading || productIsLoading,
+    isFetching: taskIsLoading && productIsLoading,
+    handleChange,
   };
 }

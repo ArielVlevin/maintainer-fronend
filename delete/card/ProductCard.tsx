@@ -8,10 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import { CardDropdownMenu } from "@/components/app-ui/card/CardDropDownMenu";
 import { Eye, List } from "lucide-react";
 import { IProduct } from "@/types";
-import DetailsDialog from "@/components/common/DetailDialog";
+import DetailsDialog from "@/components/dialog/DetailDialog";
 import { ProductDetails } from "@/components/products/____ProductDetails";
 import ProductDialog from "@/components/products/ProductDialog";
-import AlertComponent from "@/components/common/AlertDialog";
+import AlertComponent from "@/components/dialog/AlertDialog";
 import MaintenanceStatus from "./MaintenanceStatus";
 import { Center } from "../Center";
 

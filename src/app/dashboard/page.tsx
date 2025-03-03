@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/authContext";
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/modules/auth/AuthGuard";
 
 import PageHeader from "@/components/layout/PageHeader";
 import ProductListContainer from "@/modules/products/components/ProductListContainer";

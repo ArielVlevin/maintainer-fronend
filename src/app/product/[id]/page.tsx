@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/modules/auth/AuthGuard";
 import { useProducts } from "@/modules/products/hooks/useProduct";
 import TaskListContainer from "@/modules/tasks/components/TaskListContainer";
 

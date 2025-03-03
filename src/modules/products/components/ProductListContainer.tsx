@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useProductActions } from "@/modules/products/hooks/useProductActions";
 import ProductList from "./ProductList";
 import ProductDialog from "@/modules/products/dialogs/ProductDialog";
-import ConfirmDeleteDialog from "@/components/common/ConfirmDeleteDialog";
-import { AddProductButton } from "@/modules/products/dialogs/ProductDialog";
+import ConfirmDeleteDialog from "@/components/dialog/ConfirmDeleteDialog";
 import { useProducts } from "@/modules/products/hooks/useProduct";
 import ProductListSkeleton from "../styles/ProductListSkeleton";
 import { NoProductsMessage } from "./NoProductsMessage";
 import { IProduct } from "@/types/IProduct";
 import { useNotification } from "@/context/NotificationContext";
+import { AddProductButton } from "../dialogs/AddProductButton";
 
 /**
  * @component ProductListContainer

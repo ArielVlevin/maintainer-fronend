@@ -44,7 +44,7 @@ export default function Avatar({
   const currentImage = previewUrl;
 
   return (
-    <div className="-mt-10 px-6">
+    <div className="mb-2">
       {/* Avatar container */}
       <div className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 border-background bg-muted shadow-sm shadow-black/10">
         {/* Display the uploaded or default image */}

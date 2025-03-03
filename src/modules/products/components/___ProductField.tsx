@@ -25,7 +25,7 @@
  */
 
 import Avatar from "@/components/img/Avatar";
-import FormField from "@/components/app-ui/FormField";
+import InputField from "@/components/input/___InputField";
 import { IProduct } from "@/types/IProduct";
 
 interface ProductFieldsProps {
@@ -46,32 +46,33 @@ const ProductFields: React.FC<ProductFieldsProps> = ({
   imageUploadProps,
 }) => {
   return (
-    <>
+    <div className="space-y-4">
       {/* Product Image Upload */}
       <Avatar {...imageUploadProps} prevImage={formData.iconUrl} />
 
       {/* Product Name Field */}
-      <FormField
+      <InputField
         label="Name"
         type="text"
         name="name"
-        placeholder="Enter product name"
+        placeholder="Product name"
         value={formData.name}
         onChange={handleChange}
         required
       />
 
       {/* Product Category Field */}
-      <FormField
+      <InputField
         label="Category"
         type="text"
         name="category"
+        placeholder="Category"
         value={formData.category || ""}
         onChange={handleChange}
       />
 
       {/* Manufacturer Field */}
-      <FormField
+      <InputField
         label="Manufacturer"
         type="text"
         name="manufacturer"
@@ -80,7 +81,7 @@ const ProductFields: React.FC<ProductFieldsProps> = ({
       />
 
       {/* Model Field */}
-      <FormField
+      <InputField
         label="Model"
         type="text"
         name="model"
@@ -89,7 +90,7 @@ const ProductFields: React.FC<ProductFieldsProps> = ({
       />
 
       {/* Tags Field */}
-      <FormField
+      <InputField
         label="Tags"
         type="text"
         name="tags"
@@ -103,14 +104,14 @@ const ProductFields: React.FC<ProductFieldsProps> = ({
       />
 
       {/* Purchase Date Field */}
-      <FormField
+      <InputField
         label="Purchase Date"
         type="date"
         name="purchaseDate"
         value={formData.purchaseDate as Date}
         onChange={handleChange}
       />
-    </>
+    </div>
   );
 };
 
