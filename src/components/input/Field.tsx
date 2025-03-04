@@ -39,7 +39,7 @@ import { DateInput, dateInputStyle } from "../ui/datefield-rac";
 import { Label } from "../ui/label";
 import { InputWrapper } from "./InputWrapper";
 import { useCharacterLimit } from "@/hooks/use-character-limit";
-import { type Tag, TagInput } from "emblor";
+import { TagInput } from "emblor";
 import { useId, useState } from "react";
 
 interface ReusableFormFieldProps {
@@ -161,15 +161,14 @@ export function Field({
                       : []
                   }
                   setTags={(newTags) => {
-                    // ✅ בדיקה אם `newTags` הוא מערך
                     if (Array.isArray(newTags)) {
                       const updatedTags = newTags.map((tag) => tag.text);
                       setValue(name, updatedTags);
                     }
                   }}
                   placeholder="Add a tag"
-                  activeTagIndex={activeTagIndex} // ✅ הוספנו את האינדקס של התגית הפעילה
-                  setActiveTagIndex={setActiveTagIndex} // ✅ עדכון האינדקס של התגית הפעילה
+                  activeTagIndex={activeTagIndex}
+                  setActiveTagIndex={setActiveTagIndex}
                   styleClasses={{
                     tagList: {
                       container: "gap-1",

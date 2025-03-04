@@ -10,7 +10,7 @@ export interface IProduct {
   slug: string;
 
   category?: string; // Optional category of the product
-  tags?: string[] | string; // Tags associated with the product (string or array)
+  tags?: string[]; // Tags associated with the product (string or array)
 
   manufacturer?: string; // Optional manufacturer name
   model?: string; // Optional model name

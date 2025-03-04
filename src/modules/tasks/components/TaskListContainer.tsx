@@ -13,6 +13,7 @@ import { IProduct } from "@/types/IProduct";
 import { useNotification } from "@/context/NotificationContext";
 import { AddTaskButton } from "../dialogs/AddTaskButton";
 import TaskDialog from "../dialogs/TaskDialog";
+import Pagination from "@/components/table/Pagination";
 
 /**
  * @component TaskListContainer
@@ -22,32 +23,35 @@ import TaskDialog from "../dialogs/TaskDialog";
  * @param {string} [props.productId] - If provided, fetches tasks for a specific product.
  */
 export default function TaskListContainer({
+  header = "Tasks",
   product,
   dropMenu = false,
   enableSearch = false,
   paginationControls = true,
 }: {
+  header?: string;
   product?: IProduct;
   dropMenu?: boolean;
   enableSearch?: boolean;
   paginationControls?: boolean;
 }) {
-  const [page, setPage] = useState(1);
-  const limit = 10; // Number of tasks per page
   const { showError } = useNotification();
+  const { deleteMutation, completeTaskMutation, postponeTaskMutation } =
+    useTaskActions();
+
+  const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const { data, isLoading, isError, error } = useTasks({
     product_id: product?._id,
     page,
     limit,
   });
-
-  const { deleteMutation, completeTaskMutation, postponeTaskMutation } =
-    useTaskActions();
-  const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
 
   if (isLoading) return <TaskListSkeleton />;
   if (isError) showError(error?.message || "Failed to load tasks.");
@@ -56,7 +60,7 @@ export default function TaskListContainer({
   return (
     <>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Your Recent Tasks</h2>
+        <h2 className="text-2xl font-semibold">{header}</h2>
         <AddTaskButton productId={product?._id} />
       </div>
 
@@ -83,7 +87,13 @@ export default function TaskListContainer({
       />
 
       {/* Pagination Controls */}
-      {paginationControls && data?.totalPages && data.totalPages > 1 && (
+      {paginationControls && (
+        <Pagination
+          currentPage={page}
+          totalPages={data.totalPages}
+          onPageChange={setPage}
+        />
+        /*
         <div className="flex justify-center mt-4">
           <button
             className="mr-2 px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
@@ -100,7 +110,7 @@ export default function TaskListContainer({
           >
             Next
           </button>
-        </div>
+        </div>*/
       )}
 
       <ConfirmDeleteDialog

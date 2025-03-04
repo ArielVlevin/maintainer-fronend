@@ -2,7 +2,7 @@
 
 import { TableRow } from "@/components/ui/table";
 import { ITask, TaskStatusType } from "@/types/ITask";
-import GenericList from "@/components/common/GenericList";
+import GenericList from "@/components/table/GenericList";
 import { TaskStatusFilter } from "./TaskStatusFilter";
 import {
   renderTaskNameCell,

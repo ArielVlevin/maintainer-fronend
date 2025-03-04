@@ -25,8 +25,15 @@ export default function UserAreaPage() {
             title={`Welcome, ${user?.name}`}
             description={DESCRIPTION}
           />
-          <ProductListContainer />
-          <TaskListContainer paginationControls={false} />
+          <ProductListContainer
+            header={"Your Recent Products"}
+            enablePagination={false}
+            enableSearch={false}
+          />
+          <TaskListContainer
+            header="Your Recent Tasks"
+            paginationControls={false}
+          />
         </motion.div>
       </div>
     </AuthGuard>

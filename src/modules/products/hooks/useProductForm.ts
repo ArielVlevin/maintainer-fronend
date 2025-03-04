@@ -7,8 +7,9 @@ import { useProductActions } from "./useProductActions";
 import { useProducts } from "@/modules/products/hooks/useProduct";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formSchema, ProductFormData } from "../schema/productFormSchema";
+import { formSchema } from "../schema/productFormSchema";
 import { useImageUpload } from "@/hooks/use-image-upload";
+import { IProduct } from "@/types/IProduct";
 
 interface UseProductFormProps {
   product_id?: string;
@@ -20,28 +21,28 @@ export function useProductForm({ product_id }: UseProductFormProps) {
   const { addMutation, updateMutation } = useProductActions();
   const imageUploadProps = useImageUpload();
 
-  // ברירות מחדל למוצר חדש
-  const defaultValues: ProductFormData = useMemo(
+  const defaultValues: IProduct = useMemo(
     () => ({
       product_id: product_id || "",
       name: "",
+      slug: "",
       category: "",
       manufacturer: "",
       model: "",
       tags: [],
       purchaseDate: new Date(),
+      tasks: [],
       lastOverallMaintenance: undefined,
       nextOverallMaintenance: undefined,
     }),
     [product_id]
   );
 
-  const form = useForm<ProductFormData>({
+  const form = useForm<IProduct>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  // אם עורך מוצר קיים - טען את הנתונים מהשרת
   const { data, isFetching } = useProducts({
     product_id,
     enabled: !!product_id,
@@ -53,9 +54,8 @@ export function useProductForm({ product_id }: UseProductFormProps) {
     }
   }, [product_id, data, form]);
 
-  // שליחת נתוני המוצר לשרת
   const mutation = useMutation({
-    mutationFn: async (values: ProductFormData) => {
+    mutationFn: async (values: IProduct) => {
       const file = imageUploadProps.fileInputRef.current?.files?.[0];
 
       return product_id
@@ -84,5 +84,6 @@ export function useProductForm({ product_id }: UseProductFormProps) {
     mutation,
     isFetching,
     imageUploadProps,
+    isSubmitting: addMutation.isPending || updateMutation.isPending,
   };
 }

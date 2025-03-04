@@ -14,7 +14,7 @@ export default function ProductsPage() {
           transition={{ duration: 0.8 }}
           className="max-w-6xl mx-auto space-y-6"
         >
-          <ProductListContainer />
+          <ProductListContainer enableSearch />
         </motion.div>
       </div>
     </AuthGuard>

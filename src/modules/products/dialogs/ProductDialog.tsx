@@ -25,6 +25,7 @@ export default function ProductDialog({
         open={open}
         onClose={onClose}
         onConfirm={form.handleSubmit((values) => {
+          console.log("form: ", form.getValues());
           mutation.mutate(values, {
             onSuccess: () => onClose(),
           });

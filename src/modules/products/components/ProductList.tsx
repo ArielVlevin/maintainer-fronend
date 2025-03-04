@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
 import { IProduct } from "@/types/IProduct";
 import { formatDate } from "@/lib/utils";
-import GenericList from "@/components/common/GenericList";
+import GenericList from "@/components/table/GenericList";
 import { CardDropdownMenu } from "@/components/common/CardDropDownMenu";
-import { renderTableCell } from "@/components/common/renderTableCell";
+import { renderTableCell } from "@/components/table/renderTableCell";
 
 /**
  * @component ProductList
@@ -15,10 +15,12 @@ import { renderTableCell } from "@/components/common/renderTableCell";
  */
 export default function ProductList({
   products,
+  enableSearch = false,
   onEdit,
   onDelete,
 }: {
   products: IProduct[];
+  enableSearch?: boolean;
   onEdit: (product: IProduct) => void;
   onDelete: (product: IProduct) => void;
 }) {
@@ -33,7 +35,7 @@ export default function ProductList({
         "lastOverallMaintenance",
         "nextOverallMaintenance",
       ]}
-      enableSearch={true}
+      enableSearch={enableSearch}
       headers={[
         "Product Name",
         "Category",
